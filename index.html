@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#e8652a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>Our Recipes</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ==================== APP SHELL ==================== -->
+  <div id="app">
+
+    <!-- TOP HEADER (visible on list view) -->
+    <header id="main-header">
+      <h1>Our Recipes</h1>
+      <div class="header-search">
+        <input type="search" id="search-input" placeholder="Search recipes…" autocomplete="off" />
+      </div>
+    </header>
+
+    <!-- ==================== VIEWS ==================== -->
+
+    <!-- VIEW: Recipe List -->
+    <main id="view-list" class="view active">
+      <div id="recipe-grid"></div>
+      <div id="empty-state" class="empty-state hidden">
+        <span class="empty-icon">🍽️</span>
+        <p>No recipes yet.<br>Tap <strong>+</strong> to add one!</p>
+      </div>
+    </main>
+
+    <!-- VIEW: Add Recipe -->
+    <main id="view-add" class="view hidden">
+      <div class="view-header">
+        <button class="back-btn" onclick="showView('list')">← Back</button>
+        <h2>Add Recipe</h2>
+      </div>
+
+      <!-- Tab switcher -->
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="url">From URL</button>
+        <button class="tab-btn" data-tab="manual">Manual Entry</button>
+      </div>
+
+      <!-- Tab: URL import -->
+      <div id="tab-url" class="tab-content active">
+        <div class="form-group">
+          <label for="recipe-url">Paste a recipe link</label>
+          <input type="url" id="recipe-url" placeholder="https://www.example.com/recipe/..." />
+        </div>
+        <button id="fetch-btn" class="btn-primary" onclick="fetchRecipe()">
+          <span id="fetch-btn-text">Extract Recipe</span>
+          <span id="fetch-spinner" class="spinner hidden"></span>
+        </button>
+        <p id="fetch-error" class="error-msg hidden"></p>
+      </div>
+
+      <!-- Tab: Manual entry -->
+      <div id="tab-manual" class="tab-content hidden">
+        <!-- manual form is rendered here by JS -->
+      </div>
+
+      <!-- Shared edit form (shown after URL fetch or in manual mode) -->
+      <div id="edit-form" class="hidden">
+        <hr />
+        <h3>Review &amp; Save</h3>
+
+        <div class="form-group">
+          <label for="edit-title">Title *</label>
+          <input type="text" id="edit-title" placeholder="Recipe name" />
+        </div>
+
+        <div class="form-group">
+          <label for="edit-image">Image URL</label>
+          <input type="url" id="edit-image" placeholder="https://…" />
+          <img id="edit-image-preview" class="image-preview hidden" alt="Preview" />
+        </div>
+
+        <div class="form-group">
+          <label for="edit-servings">Servings</label>
+          <input type="text" id="edit-servings" placeholder="e.g. 4 servings" />
+        </div>
+
+        <div class="form-group">
+          <label for="edit-source">Source URL</label>
+          <input type="url" id="edit-source" placeholder="Original link" />
+        </div>
+
+        <div class="form-group">
+          <label>Ingredients *</label>
+          <div id="ingredients-list"></div>
+          <button class="btn-secondary small" onclick="addIngredientRow()">+ Add ingredient</button>
+        </div>
+
+        <div class="form-group">
+          <label>Instructions *</label>
+          <div id="instructions-list"></div>
+          <button class="btn-secondary small" onclick="addInstructionRow()">+ Add step</button>
+        </div>
+
+        <div class="form-row">
+          <button class="btn-secondary" onclick="cancelEdit()">Cancel</button>
+          <button class="btn-primary" onclick="saveRecipe()">
+            <span id="save-btn-text">Save Recipe</span>
+            <span id="save-spinner" class="spinner hidden"></span>
+          </button>
+        </div>
+        <p id="save-error" class="error-msg hidden"></p>
+      </div>
+    </main>
+
+    <!-- VIEW: Recipe Detail -->
+    <main id="view-detail" class="view hidden">
+      <div class="view-header sticky-header" id="detail-header">
+        <button class="back-btn" onclick="showView('list')">← Back</button>
+        <h2 id="detail-title"></h2>
+        <button class="icon-btn delete-btn" onclick="confirmDelete()" title="Delete recipe">🗑</button>
+      </div>
+      <div id="detail-content"></div>
+    </main>
+
+    <!-- BOTTOM NAV -->
+    <nav id="bottom-nav">
+      <button class="nav-btn active" data-view="list" onclick="showView('list')">
+        <span class="nav-icon">🏠</span>
+        <span>Recipes</span>
+      </button>
+      <button class="nav-btn add-btn" onclick="showView('add')">
+        <span class="nav-icon">＋</span>
+        <span>Add</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- DELETE CONFIRM MODAL -->
+  <div id="delete-modal" class="modal hidden">
+    <div class="modal-box">
+      <p>Delete this recipe?</p>
+      <div class="form-row">
+        <button class="btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+        <button class="btn-danger" onclick="deleteRecipe()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
