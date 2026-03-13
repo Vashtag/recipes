@@ -9,27 +9,27 @@
     "ingredients": [
       "3 cups chopped cooked chicken breast (rotisserie or grilled chicken are best)",
       "12 ounces short pasta of choice: farfalle, penne, elbows, etc. (can also use gluten-free pasta)",
-      "ÃÂÃÂ¼ cup salted butter",
+      "ÃÂÃÂÃÂÃÂ¼ cup salted butter",
       "1 yellow onion, diced",
       "2 cloves garlic, minced",
       "2 tablespoons all-purpose flour (or all-purpose gluten-free flour)",
       "2 tablespoons tomato paste",
       "14.5 oz canned diced tomatoes, drained",
       "2 cups whole milk",
-      "2-3 teaspoons Italian seasoning (or sub up to ÃÂÃÂ¼ cup chopped fresh herbs like basil)",
-      "ÃÂÃÂ¼ to ÃÂÃÂ½ teaspoon red pepper flakes (to taste)",
-      "ÃÂÃÂ½ teaspoon salt",
+      "2-3 teaspoons Italian seasoning (or sub up to ÃÂÃÂÃÂÃÂ¼ cup chopped fresh herbs like basil)",
+      "ÃÂÃÂÃÂÃÂ¼ to ÃÂÃÂÃÂÃÂ½ teaspoon red pepper flakes (to taste)",
+      "ÃÂÃÂÃÂÃÂ½ teaspoon salt",
       "ground black pepper to taste",
       "2 cups shredded mozzarella cheese, divided",
-      "ÃÂÃÂ¾ cup shredded parmesan cheese, divided",
-      "ÃÂÃÂ¼ cup fresh chopped parsley (plus more for garnish)"
+      "ÃÂÃÂÃÂÃÂ¾ cup shredded parmesan cheese, divided",
+      "ÃÂÃÂÃÂÃÂ¼ cup fresh chopped parsley (plus more for garnish)"
     ],
     "instructions": [
-      "Preheat oven to 400ÃÂÃÂF. Lightly grease a 9x13ÃÂ¢ÃÂÃÂ baking dish.",
-      "Cook the pasta in salted water according to package instructions. Reserve a ÃÂÃÂ½ cup pasta water. Drain the rest and set the pasta aside.",
-      "Melt butter in a large skillet over medium heat. Add the onion and sautÃÂÃÂ© for 3-5 minutes. Add the garlic and continue cooking for 30 seconds until fragrant, then evenly sprinkle in the flour, add the tomato paste and stir well. Continue cooking for 1-2 minutes, stirring often.",
+      "Preheat oven to 400ÃÂÃÂÃÂÃÂF. Lightly grease a 9x13ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ baking dish.",
+      "Cook the pasta in salted water according to package instructions. Reserve a ÃÂÃÂÃÂÃÂ½ cup pasta water. Drain the rest and set the pasta aside.",
+      "Melt butter in a large skillet over medium heat. Add the onion and sautÃÂÃÂÃÂÃÂ© for 3-5 minutes. Add the garlic and continue cooking for 30 seconds until fragrant, then evenly sprinkle in the flour, add the tomato paste and stir well. Continue cooking for 1-2 minutes, stirring often.",
       "Add the diced tomatoes and slowly stir in the milk until well combined. Sprinkle in the Italian seasoning, red pepper flakes, salt and pepper. Bring to a simmer. Cook for a few minutes, stirring often, until the sauce starts to thicken.",
-      "Add the parsley, 1 ÃÂÃÂ½ cups mozzarella cheese, and ÃÂÃÂ½ cup parmesan cheese. Stir until cheese is melted, then whisk in the reserved pasta water until the sauce is nicely thinned and smooth. Fold in the diced cooked chicken.",
+      "Add the parsley, 1 ÃÂÃÂÃÂÃÂ½ cups mozzarella cheese, and ÃÂÃÂÃÂÃÂ½ cup parmesan cheese. Stir until cheese is melted, then whisk in the reserved pasta water until the sauce is nicely thinned and smooth. Fold in the diced cooked chicken.",
       "Add the cooked pasta to the prepared baking dish, then top with the chicken/sauce mixture and stir well to combine. Top with remaining mozzarella and parmesan cheese.",
       "Bake uncovered for 20 minutes, until the cheese is golden brown and bubbly. Serve immediately topped with fresh parsley."
     ],
@@ -39,10 +39,12 @@
     "id": "573f4066-eb50-47a9-88df-84a78a8c026a",
     "title": "Tiramisu",
     "image": "https://tastesbetterfromscratch.com/wp-content/uploads/2017/04/Tiramisu-15-480x270.jpg",
-    "category": "Dessert",
+    "category": [
+      "Dessert"
+    ],
     "servings": "9",
     "sourceUrl": "https://tastesbetterfromscratch.com/easy-tiramisu/",
-    "notes": "",
+    "notes": "Add fun",
     "ingredients": [
       "1 1/2 cups heavy whipping cream ((360 ml))",
       "8 ounce container mascarpone cheese (,room temperature (225 g))",
