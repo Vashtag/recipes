@@ -158,6 +158,17 @@ html, body {
   transition: transform 0.18s ease, box-shadow 0.18s ease;
   -webkit-tap-highlight-color: transparent;
   border: 1px solid var(--border);
+  position: relative;
+}
+.card-fav-star {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 1.1rem;
+  color: #f5a623;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
 }
 
 .recipe-card:active {
@@ -274,7 +285,22 @@ html, body {
   transition: background 0.15s;
 }
 .icon-btn:active { background: var(--border); }
+.fav-btn--active { color: #f5a623; }
 .detail-actions { margin-left: auto; display: flex; gap: 2px; }
+
+/* Grid section headings */
+.grid-section-heading {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted2);
+  padding: 12px 14px 4px;
+  margin: 0;
+}
+.grid-section-heading--all {
+  margin-top: 4px;
+}
 
 /* Tab bar */
 .tab-bar {

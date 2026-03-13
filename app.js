@@ -217,10 +217,30 @@ async function saveToGitHub() {
 }
 
 // ── Recipe Grid ────────────────────────────────────
+function recipeCardHtml(r) {
+  return `
+    <div class="recipe-card" onclick="openRecipe('${r.id}')">
+      ${r.favourite ? `<span class="card-fav-star" title="Favourite">★</span>` : ""}
+      ${r.image
+        ? `<img class="card-img" src="${escHtml(r.image)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+        : ""}
+      <div class="card-img-placeholder" style="${r.image ? "display:none" : ""}">🍽️</div>
+      <div class="card-body">
+        ${[].concat(r.category||[]).length ? `<span class="card-category">${[].concat(r.category).map(escHtml).join(", ")}</span>` : ""}
+        <h3>${escHtml(r.title)}</h3>
+        ${r.sourceUrl ? `<p class="card-source">${sourceDomain(r.sourceUrl)}</p>` : ""}
+      </div>
+    </div>
+  `;
+}
+
 function renderGrid() {
   const query = document.getElementById("search-input").value.trim().toLowerCase();
   const grid = document.getElementById("recipe-grid");
   const empty = document.getElementById("empty-state");
+  const favSection = document.getElementById("favourites-section");
+  const favGrid = document.getElementById("favourites-grid");
+  const allHeading = document.querySelector(".grid-section-heading--all");
 
   let filtered = recipes;
   if (query) {
@@ -232,24 +252,26 @@ function renderGrid() {
 
   if (filtered.length === 0) {
     grid.innerHTML = "";
+    favSection.classList.add("hidden");
+    allHeading.classList.add("hidden");
     empty.classList.remove("hidden");
     return;
   }
   empty.classList.add("hidden");
 
-  grid.innerHTML = filtered.map(r => `
-    <div class="recipe-card" onclick="openRecipe('${r.id}')">
-      ${r.image
-        ? `<img class="card-img" src="${escHtml(r.image)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-        : ""}
-      <div class="card-img-placeholder" style="${r.image ? "display:none" : ""}">🍽️</div>
-      <div class="card-body">
-        ${[].concat(r.category||[]).length ? `<span class="card-category">${[].concat(r.category).map(escHtml).join(", ")}</span>` : ""}
-        <h3>${escHtml(r.title)}</h3>
-        ${r.sourceUrl ? `<p class="card-source">${sourceDomain(r.sourceUrl)}</p>` : ""}
-      </div>
-    </div>
-  `).join("");
+  const favs = filtered.filter(r => r.favourite);
+  const rest = filtered.filter(r => !r.favourite);
+
+  if (favs.length > 0) {
+    favSection.classList.remove("hidden");
+    favGrid.innerHTML = favs.map(recipeCardHtml).join("");
+    allHeading.classList.toggle("hidden", rest.length === 0);
+  } else {
+    favSection.classList.add("hidden");
+    allHeading.classList.add("hidden");
+  }
+
+  grid.innerHTML = rest.map(recipeCardHtml).join("");
 }
 
 function sourceDomain(url) {
@@ -721,6 +743,9 @@ function openRecipe(id) {
   currentRecipeId = id;
 
   document.getElementById("detail-title").textContent = recipe.title;
+  const favBtn = document.getElementById("fav-btn");
+  favBtn.textContent = recipe.favourite ? "★" : "☆";
+  favBtn.classList.toggle("fav-btn--active", !!recipe.favourite);
 
   const content = document.getElementById("detail-content");
   content.innerHTML = `
@@ -780,6 +805,28 @@ function formatDate(iso) {
 }
 
 // ── Delete ─────────────────────────────────────────
+// ── Favourite ──────────────────────────────────────
+async function toggleFavourite() {
+  const recipe = recipes.find(r => r.id === currentRecipeId);
+  if (!recipe) return;
+  recipe.favourite = !recipe.favourite;
+
+  const favBtn = document.getElementById("fav-btn");
+  favBtn.textContent = recipe.favourite ? "★" : "☆";
+  favBtn.classList.toggle("fav-btn--active", recipe.favourite);
+
+  try {
+    await refreshSha();
+    await saveToGitHub();
+    showToast(recipe.favourite ? "Added to favourites." : "Removed from favourites.");
+  } catch (e) {
+    recipe.favourite = !recipe.favourite; // rollback
+    favBtn.textContent = recipe.favourite ? "★" : "☆";
+    favBtn.classList.toggle("fav-btn--active", recipe.favourite);
+    showToast(`Could not save: ${e.message}`);
+  }
+}
+
 function confirmDelete() {
   document.getElementById("delete-modal").classList.remove("hidden");
 }
