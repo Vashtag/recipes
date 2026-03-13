@@ -43,76 +43,46 @@ function showBanner(html, type = "warn") {
 }
 
 // ── Fridge (ingredient-based recipe finder) ────────
-let fridgeTags = [];
-
 function initFridgeView() {
-  renderFridgeTags();
+  document.getElementById("fridge-input").focus();
   renderFridgeResults();
-}
-
-function addFridgeTag() {
-  const input = document.getElementById("fridge-input");
-  const val = input.value.trim().toLowerCase();
-  if (val && !fridgeTags.includes(val)) {
-    fridgeTags.push(val);
-    renderFridgeTags();
-    renderFridgeResults();
-  }
-  input.value = "";
-  input.focus();
-}
-
-function removeFridgeTag(tag) {
-  fridgeTags = fridgeTags.filter(t => t !== tag);
-  renderFridgeTags();
-  renderFridgeResults();
-}
-
-function renderFridgeTags() {
-  const el = document.getElementById("fridge-tags");
-  if (fridgeTags.length === 0) {
-    el.innerHTML = '<p class="fridge-hint">Add ingredients above to find matching recipes.</p>';
-    return;
-  }
-  el.innerHTML = fridgeTags.map(tag => `
-    <span class="fridge-tag">${escHtml(tag)}<button onclick="removeFridgeTag('${escHtml(tag)}')" class="fridge-tag-remove">✕</button></span>
-  `).join("");
 }
 
 function renderFridgeResults() {
+  const query = document.getElementById("fridge-input").value.trim().toLowerCase();
   const el = document.getElementById("fridge-results");
-  if (fridgeTags.length === 0) { el.innerHTML = ""; return; }
-  if (recipes.length === 0) { el.innerHTML = '<p class="fridge-hint">No recipes saved yet.</p>'; return; }
 
-  const scored = recipes.map(r => {
-    const recipeIngredients = (r.ingredients || []).join(" ").toLowerCase();
-    const matched = fridgeTags.filter(tag => recipeIngredients.includes(tag));
-    return { recipe: r, matched: matched.length, total: fridgeTags.length };
-  }).filter(s => s.matched > 0)
-    .sort((a, b) => b.matched - a.matched || a.recipe.title.localeCompare(b.recipe.title));
-
-  if (scored.length === 0) {
-    el.innerHTML = '<p class="fridge-hint">No recipes match your ingredients yet.</p>';
-    return;
+  if (!query) { el.innerHTML = ""; return; }
+  if (recipes.length === 0) {
+    el.innerHTML = '<p class="fridge-hint">No recipes saved yet.</p>'; return;
   }
 
-  el.innerHTML = scored.map(({ recipe: r, matched, total }) => `
-    <div class="fridge-result-card" onclick="openRecipe('${r.id}')">
-      ${r.image ? `<img class="fridge-card-img" src="${escHtml(r.image)}" alt="" loading="lazy" onerror="this.style.display='none'">` : `<div class="fridge-card-img fridge-card-img--placeholder">🍽️</div>`}
-      <div class="fridge-card-body">
-        <h3>${escHtml(r.title)}</h3>
-        <div class="fridge-match ${matched === total ? 'fridge-match--full' : ''}">
-          ${matched === total ? '✅' : '🟡'} ${matched} of ${total} ingredient${total > 1 ? 's' : ''} matched
+  const matches = recipes.filter(r =>
+    (r.ingredients || []).some(ing => ing.toLowerCase().includes(query))
+  );
+
+  if (matches.length === 0) {
+    el.innerHTML = `<p class="fridge-hint">No recipes use "${escHtml(query)}".</p>`; return;
+  }
+
+  el.innerHTML = matches.map(r => {
+    const matchedIngs = (r.ingredients || []).filter(ing => ing.toLowerCase().includes(query));
+    return `
+      <div class="fridge-result-card" onclick="openRecipe('${r.id}')">
+        ${r.image
+          ? `<img class="fridge-card-img" src="${escHtml(r.image)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+          : ""}
+        <div class="fridge-card-img fridge-card-img--placeholder" style="${r.image ? "display:none" : ""}">🍽️</div>
+        <div class="fridge-card-body">
+          <h3>${escHtml(r.title)}</h3>
+          <p class="fridge-matched-ings">${matchedIngs.map(i => escHtml(i)).join(", ")}</p>
         </div>
-      </div>
-    </div>
-  `).join("");
+      </div>`;
+  }).join("");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("fridge-input").addEventListener("keydown", e => {
-    if (e.key === "Enter") { e.preventDefault(); addFridgeTag(); }
-  });
+  document.getElementById("fridge-input").addEventListener("input", renderFridgeResults);
 });
 
 // ── Settings ───────────────────────────────────────
