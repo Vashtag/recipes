@@ -220,10 +220,15 @@ async function fetchRecipe() {
     const html = await fetchViaProxy(url);
     const parsed = parseRecipeFromHtml(html, url);
     if (!parsed) {
-      throw new Error("Could not find recipe data on this page. Try manual entry instead.");
+      throw new Error("Could not find recipe data on this page. Switch to Manual Entry and fill in the details.");
     }
     populateEditForm(parsed);
     document.getElementById("edit-form").classList.remove("hidden");
+    if (parsed.partial) {
+      showError(errEl, "⚠️ Only the title and image could be extracted from this site. Please fill in the ingredients and instructions below.");
+      errEl.style.background = "#2a2e1a";
+      errEl.style.color = "#a8c060";
+    }
   } catch (e) {
     showError(errEl, e.message);
   } finally {
@@ -231,89 +236,172 @@ async function fetchRecipe() {
   }
 }
 
+// ── Proxy list (tried in order until one works) ────
+const PROXIES = [
+  (url) => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+  (url) => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+  (url) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+];
+
 async function fetchViaProxy(url) {
-  // Try allorigins first
-  const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-  const res = await fetch(proxy);
-  if (!res.ok) throw new Error("Could not fetch the page. Check your internet and try again.");
-  const data = await res.json();
-  if (!data.contents) throw new Error("The page returned empty content.");
-  return data.contents;
+  let lastErr = null;
+  for (const makeProxy of PROXIES) {
+    try {
+      const proxyUrl = makeProxy(url);
+      const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(12000) });
+      if (!res.ok) { lastErr = new Error(`Proxy returned ${res.status}`); continue; }
+      // allorigins wraps in JSON; codetabs and corsproxy return raw HTML
+      const ct = res.headers.get("content-type") || "";
+      if (ct.includes("application/json")) {
+        const data = await res.json();
+        const html = data.contents || data.body || data.html || "";
+        if (html) return html;
+        lastErr = new Error("Proxy returned empty content"); continue;
+      }
+      const html = await res.text();
+      if (html) return html;
+      lastErr = new Error("Proxy returned empty content");
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw new Error("Could not fetch the page through any proxy. Check your internet connection, or use Manual Entry.");
 }
 
 function parseRecipeFromHtml(html, sourceUrl) {
-  // 1. Try JSON-LD structured data (most reliable)
+  // ── Strategy 1: JSON-LD structured data ────────────
   const jsonLdMatches = [...html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
   for (const match of jsonLdMatches) {
     try {
-      let data = JSON.parse(match[1]);
-      // Some pages wrap it in @graph
-      if (data["@graph"]) data = data["@graph"].find(n => n["@type"] === "Recipe" || (Array.isArray(n["@type"]) && n["@type"].includes("Recipe")));
-      if (!data) continue;
-      if (data["@type"] === "Recipe" || (Array.isArray(data["@type"]) && data["@type"].includes("Recipe"))) {
-        return extractFromJsonLd(data, sourceUrl);
+      let obj = JSON.parse(match[1].replace(/[\u0000-\u001F]/g, " "));
+      // Handle @graph arrays (common on WordPress/Yoast sites)
+      const candidates = [];
+      if (Array.isArray(obj)) candidates.push(...obj);
+      else if (obj["@graph"]) candidates.push(...(Array.isArray(obj["@graph"]) ? obj["@graph"] : [obj["@graph"]]));
+      else candidates.push(obj);
+
+      for (const node of candidates) {
+        const types = [].concat(node["@type"] || []);
+        if (types.some(t => String(t).toLowerCase().includes("recipe"))) {
+          const result = extractFromJsonLd(node, sourceUrl);
+          if (result.title) return result;
+        }
       }
     } catch { /* skip malformed */ }
   }
 
-  // 2. Try Open Graph / meta tags fallback (partial data only)
+  // ── Strategy 2: HTML microdata (itemprop) ──────────
+  const microdataResult = parseMicrodata(html, sourceUrl);
+  if (microdataResult && microdataResult.title) return microdataResult;
+
+  // ── Strategy 3: Meta tags (partial — at least gets title/image) ──
   const title = metaContent(html, "og:title") || metaContent(html, "twitter:title") || htmlTitle(html);
   const image = metaContent(html, "og:image") || metaContent(html, "twitter:image");
   if (title) {
-    return { title, image: image || "", ingredients: [], instructions: [], servings: "", sourceUrl };
+    return { title: cleanText(title), image: image || "", ingredients: [], instructions: [], servings: "", sourceUrl, partial: true };
   }
 
   return null;
 }
 
 function extractFromJsonLd(data, sourceUrl) {
-  const title = textOf(data.name) || "";
-  const image = imageUrl(data.image) || "";
-  const servings = textOf(data.recipeYield) || textOf(data.yield) || "";
+  const title = cleanText(textOf(data.name));
+  const image = bestImageUrl(data.image);
+  const servings = cleanText(textOf(data.recipeYield) || textOf(data.yield));
 
-  const ingredients = (data.recipeIngredient || []).map(textOf).filter(Boolean);
+  const ingredients = [].concat(data.recipeIngredient || [])
+    .map(v => cleanText(textOf(v))).filter(Boolean);
 
   let instructions = [];
-  const raw = data.recipeInstructions || [];
-  if (typeof raw === "string") {
-    instructions = raw.split(/\n|\r\n/).map(s => s.trim()).filter(Boolean);
+  const raw = data.recipeInstructions;
+  if (!raw) {
+    instructions = [];
+  } else if (typeof raw === "string") {
+    // Sometimes it's a big HTML blob
+    instructions = stripHtml(raw).split(/\n+/).map(s => s.trim()).filter(s => s.length > 3);
   } else if (Array.isArray(raw)) {
     instructions = raw.flatMap(step => {
-      if (typeof step === "string") return [step.trim()];
-      if (step["@type"] === "HowToSection") {
-        return (step.itemListElement || []).map(s => textOf(s.text || s.name || s));
+      if (!step) return [];
+      if (typeof step === "string") return [cleanText(step)];
+      const types = [].concat(step["@type"] || []);
+      if (types.some(t => String(t).toLowerCase().includes("howtosection"))) {
+        const header = step.name ? [`— ${cleanText(step.name)} —`] : [];
+        const items = [].concat(step.itemListElement || []).map(s =>
+          cleanText(textOf(s.text || s.name || s))
+        ).filter(Boolean);
+        return [...header, ...items];
       }
-      return [textOf(step.text || step.name || step)];
+      return [cleanText(textOf(step.text || step.name || step))];
     }).filter(Boolean);
   }
 
   return { title, image, ingredients, instructions, servings, sourceUrl };
 }
 
-function textOf(v) {
-  if (!v) return "";
-  if (typeof v === "string") return v.trim();
-  if (Array.isArray(v)) return v.map(textOf).join(", ");
-  return String(v).trim();
+function parseMicrodata(html, sourceUrl) {
+  // Very lightweight microdata extraction — look for itemprop attributes
+  const getItems = (prop) => {
+    const matches = [];
+    const re = new RegExp(`itemprop=["']${prop}["'][^>]*(?:content=["']([^"']+)["']|>([^<]*)<)`, "gi");
+    let m;
+    while ((m = re.exec(html)) !== null) matches.push(cleanText(m[1] || m[2] || ""));
+    return matches.filter(Boolean);
+  };
+
+  const title = getItems("name")[0] || "";
+  if (!title) return null;
+
+  const image = getItems("image")[0] || metaContent(html, "og:image") || "";
+  const servings = getItems("recipeYield")[0] || getItems("yield")[0] || "";
+  const ingredients = getItems("recipeIngredient").concat(getItems("ingredient"));
+  const instructions = getItems("recipeInstructions").concat(getItems("step")).flatMap(s =>
+    stripHtml(s).split(/\n+/).map(t => t.trim()).filter(t => t.length > 3)
+  );
+
+  return { title, image, ingredients, instructions, servings, sourceUrl };
 }
 
-function imageUrl(v) {
+// ── Text utilities ─────────────────────────────────
+function textOf(v) {
   if (!v) return "";
   if (typeof v === "string") return v;
-  if (Array.isArray(v)) return imageUrl(v[0]);
-  if (v.url) return v.url;
+  if (Array.isArray(v)) return v.map(textOf).join(" ");
+  if (typeof v === "object") return textOf(v["@value"] || v.text || v.name || v.url || "");
+  return String(v);
+}
+
+function bestImageUrl(v) {
+  if (!v) return "";
+  if (typeof v === "string") return v;
+  if (Array.isArray(v)) {
+    // Prefer the largest (last in array, common pattern) or one with a url property
+    const urls = v.map(bestImageUrl).filter(Boolean);
+    return urls[urls.length - 1] || "";
+  }
+  if (typeof v === "object") return v.url || v["@id"] || "";
   return "";
 }
 
+function stripHtml(str) {
+  return String(str || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function cleanText(str) {
+  return stripHtml(String(str || ""))
+    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ").trim();
+}
+
 function metaContent(html, prop) {
-  const m = html.match(new RegExp(`<meta[^>]+(?:property|name)=["']${prop}["'][^>]+content=["']([^"']+)["']`, "i"))
-    || html.match(new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']${prop}["']`, "i"));
-  return m ? m[1] : null;
+  const m = html.match(new RegExp(`<meta[^>]+(?:property|name)=["']${prop}["'][^>]+content=["']([^"']*?)["']`, "i"))
+    || html.match(new RegExp(`<meta[^>]+content=["']([^"']*?)["'][^>]+(?:property|name)=["']${prop}["']`, "i"));
+  return m ? cleanText(m[1]) : null;
 }
 
 function htmlTitle(html) {
   const m = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-  return m ? m[1].trim() : null;
+  return m ? cleanText(m[1]) : null;
 }
 
 function setFetchLoading(on) {
