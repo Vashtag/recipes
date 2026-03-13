@@ -587,6 +587,36 @@ html, body {
 .nav-btn.add-btn span:last-child { color: var(--muted); }
 
 /* =====================================================
+   SETTINGS VIEW
+   ===================================================== */
+.settings-body {
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.settings-intro {
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.field-hint {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.field-hint a { color: var(--orange); }
+
+.settings-status {
+  font-size: 0.88rem;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+.settings-status--ok  { background: #1a2e14; color: #80c060; }
+.settings-status--error { background: #3a1a1a; color: var(--danger); }
+
+/* =====================================================
    MODAL
    ===================================================== */
 .modal {

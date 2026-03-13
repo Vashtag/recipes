@@ -19,11 +19,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function checkConfig() {
-  if (CONFIG.githubToken === "YOUR_GITHUB_TOKEN_HERE" || !CONFIG.githubToken) {
+  if (!getToken()) {
     showBanner(
-      "⚠️ Setup needed: open <code>config.js</code> and add your GitHub token to save recipes.",
+      "⚠️ No GitHub token set. Go to <strong>Settings</strong> to add one before saving recipes.",
       "warn"
     );
+  } else {
+    const banner = document.getElementById("setup-banner");
+    if (banner) banner.remove();
   }
 }
 
@@ -38,12 +41,50 @@ function showBanner(html, type = "warn") {
   banner.innerHTML = html;
 }
 
+// ── Settings ───────────────────────────────────────
+function saveToken() {
+  const val = document.getElementById("settings-token").value.trim();
+  if (!val) {
+    showSettingsStatus("Please paste a token first.", "error"); return;
+  }
+  localStorage.setItem("gh_token", val);
+  document.getElementById("settings-token").value = "";
+  showSettingsStatus("Token saved! Loading recipes…", "ok");
+  checkConfig();
+  loadRecipes();
+}
+
+function clearToken() {
+  localStorage.removeItem("gh_token");
+  document.getElementById("settings-token").value = "";
+  showSettingsStatus("Token cleared.", "ok");
+  checkConfig();
+}
+
+function showSettingsStatus(msg, type) {
+  const el = document.getElementById("settings-status");
+  el.textContent = msg;
+  el.className = `settings-status settings-status--${type}`;
+  el.classList.remove("hidden");
+}
+
+function initSettingsView() {
+  const hasToken = !!getToken();
+  document.getElementById("settings-clear-btn").style.display = hasToken ? "" : "none";
+  document.getElementById("settings-status").classList.add("hidden");
+  document.getElementById("settings-token").value = "";
+}
+
 // ── GitHub API helpers ─────────────────────────────
 const GH_API = "https://api.github.com";
 
+function getToken() {
+  return localStorage.getItem("gh_token") || "";
+}
+
 function ghHeaders() {
   return {
-    Authorization: `token ${CONFIG.githubToken}`,
+    Authorization: `token ${getToken()}`,
     Accept: "application/vnd.github.v3+json",
     "Content-Type": "application/json",
   };
@@ -161,6 +202,7 @@ function showView(name) {
 
   if (name === "add") resetAddForm();
   if (name === "list") renderGrid();
+  if (name === "settings") initSettingsView();
 }
 
 // ── Tabs (URL / Manual) ────────────────────────────
