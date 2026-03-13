@@ -18,7 +18,10 @@
     <header id="main-header">
       <div class="header-top-row">
         <h1>Our Recipes</h1>
-        <button class="icon-btn settings-top-btn" onclick="showView('settings')" title="Settings">⚙️</button>
+        <div class="header-top-actions">
+          <button class="icon-btn" onclick="showView('planner')" title="Meal Planner">📅</button>
+          <button class="icon-btn settings-top-btn" onclick="showView('settings')" title="Settings">⚙️</button>
+        </div>
       </div>
       <div class="header-search search-wrap">
         <input type="search" id="search-input" placeholder="Search recipes…" autocomplete="off" />
@@ -162,6 +165,16 @@
       <div id="detail-content"></div>
     </main>
 
+    <!-- VIEW: Meal Planner -->
+    <main id="view-planner" class="view hidden">
+      <div class="view-header">
+        <button class="back-btn" onclick="showView('list')">← Back</button>
+        <h2>Meal Planner</h2>
+        <button class="planner-reset-btn" onclick="confirmResetPlan()" title="Clear week">↺ Reset</button>
+      </div>
+      <div id="planner-days"></div>
+    </main>
+
     <!-- VIEW: Fridge (ingredient-based search) -->
     <main id="view-fridge" class="view hidden">
       <div class="view-header">
@@ -237,6 +250,18 @@
         <span>Favourites</span>
       </button>
     </nav>
+  </div>
+
+  <!-- RECIPE PICKER MODAL (meal planner) -->
+  <div id="picker-modal" class="modal hidden">
+    <div class="modal-box picker-modal-box">
+      <div class="picker-header">
+        <h3 id="picker-title">Pick a recipe</h3>
+        <button class="icon-btn" onclick="closeRecipePicker()">✕</button>
+      </div>
+      <input type="search" id="picker-search" class="picker-search" placeholder="Search…" oninput="renderPickerList()" autocomplete="off" />
+      <div id="picker-list" class="picker-list"></div>
+    </div>
   </div>
 
   <!-- DELETE CONFIRM MODAL -->

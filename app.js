@@ -295,6 +295,7 @@ function showView(name) {
   if (name === "favourites") renderFavouritesView();
   if (name === "settings") initSettingsView();
   if (name === "fridge") initFridgeView();
+  if (name === "planner") renderPlanner();
 }
 
 // ── Tabs (URL / Manual) ────────────────────────────
@@ -932,4 +933,95 @@ function showToast(msg) {
     t.classList.remove("show");
     setTimeout(() => t.classList.add("hidden"), 300);
   }, 2500);
+}
+
+// ── Meal Planner ───────────────────────────────────
+const DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const DAY_KEYS = ["sun","mon","tue","wed","thu","fri","sat"];
+
+let mealPlan = loadMealPlan();
+let pickerTargetDay = null;
+
+function loadMealPlan() {
+  try { return JSON.parse(localStorage.getItem("mealPlan")) || {}; }
+  catch { return {}; }
+}
+
+function saveMealPlan() {
+  localStorage.setItem("mealPlan", JSON.stringify(mealPlan));
+}
+
+function renderPlanner() {
+  const container = document.getElementById("planner-days");
+  container.innerHTML = DAY_KEYS.map((key, i) => {
+    const recipeId = mealPlan[key];
+    const recipe = recipeId ? recipes.find(r => r.id === recipeId) : null;
+    return `
+      <div class="planner-day" data-day="${key}">
+        <div class="planner-day-label">${DAYS[i]}</div>
+        ${recipe ? `
+          <div class="planner-recipe-card" onclick="openRecipe('${recipe.id}')">
+            ${recipe.image ? `<img class="planner-thumb" src="${escHtml(recipe.image)}" alt="" onerror="this.style.display='none'">` : `<div class="planner-thumb-placeholder">🍽️</div>`}
+            <span class="planner-recipe-title">${escHtml(recipe.title)}</span>
+            <button class="planner-remove-btn" onclick="event.stopPropagation();removePlanDay('${key}')" title="Remove">✕</button>
+          </div>
+        ` : `
+          <button class="planner-add-btn" onclick="openRecipePicker('${key}')">＋ Add recipe</button>
+        `}
+      </div>
+    `;
+  }).join("");
+}
+
+function openRecipePicker(dayKey) {
+  pickerTargetDay = dayKey;
+  const dayIndex = DAY_KEYS.indexOf(dayKey);
+  document.getElementById("picker-title").textContent = `${DAYS[dayIndex]} — pick a recipe`;
+  document.getElementById("picker-search").value = "";
+  renderPickerList();
+  document.getElementById("picker-modal").classList.remove("hidden");
+}
+
+function renderPickerList() {
+  const q = document.getElementById("picker-search").value.trim().toLowerCase();
+  const list = document.getElementById("picker-list");
+  const filtered = q ? recipes.filter(r => r.title.toLowerCase().includes(q)) : recipes;
+  if (filtered.length === 0) {
+    list.innerHTML = `<p class="picker-empty">No recipes found.</p>`;
+    return;
+  }
+  list.innerHTML = filtered.map(r => `
+    <div class="picker-item" onclick="assignRecipe('${r.id}')">
+      ${r.image ? `<img class="picker-item-thumb" src="${escHtml(r.image)}" alt="" onerror="this.style.display='none'">` : `<div class="picker-item-thumb picker-item-thumb--empty">🍽️</div>`}
+      <span>${escHtml(r.title)}</span>
+    </div>
+  `).join("");
+}
+
+function assignRecipe(recipeId) {
+  if (!pickerTargetDay) return;
+  mealPlan[pickerTargetDay] = recipeId;
+  saveMealPlan();
+  closeRecipePicker();
+  renderPlanner();
+}
+
+function closeRecipePicker() {
+  document.getElementById("picker-modal").classList.add("hidden");
+  pickerTargetDay = null;
+}
+
+function removePlanDay(dayKey) {
+  delete mealPlan[dayKey];
+  saveMealPlan();
+  renderPlanner();
+}
+
+function confirmResetPlan() {
+  if (Object.keys(mealPlan).length === 0) return;
+  if (confirm("Clear the whole week?")) {
+    mealPlan = {};
+    saveMealPlan();
+    renderPlanner();
+  }
 }
