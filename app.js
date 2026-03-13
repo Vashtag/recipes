@@ -42,22 +42,28 @@ function showBanner(html, type = "warn") {
 }
 
 // ── Settings ───────────────────────────────────────
-function saveToken() {
-  const val = document.getElementById("settings-token").value.trim();
-  if (!val) {
-    showSettingsStatus("Please paste a token first.", "error"); return;
+function saveSettings() {
+  const token = document.getElementById("settings-token").value.trim();
+  const branch = document.getElementById("settings-branch").value.trim();
+
+  if (!token && !branch) {
+    showSettingsStatus("Nothing to save.", "error"); return;
   }
-  localStorage.setItem("gh_token", val);
+  if (token) localStorage.setItem("gh_token", token);
+  if (branch) localStorage.setItem("gh_branch", branch);
+
   document.getElementById("settings-token").value = "";
-  showSettingsStatus("Token saved! Loading recipes…", "ok");
+  showSettingsStatus(`Saved! Branch: ${getBranch()}. Loading recipes…`, "ok");
   checkConfig();
   loadRecipes();
 }
 
 function clearToken() {
   localStorage.removeItem("gh_token");
+  localStorage.removeItem("gh_branch");
   document.getElementById("settings-token").value = "";
-  showSettingsStatus("Token cleared.", "ok");
+  document.getElementById("settings-branch").value = "";
+  showSettingsStatus("Token and branch cleared.", "ok");
   checkConfig();
 }
 
@@ -73,6 +79,7 @@ function initSettingsView() {
   document.getElementById("settings-clear-btn").style.display = hasToken ? "" : "none";
   document.getElementById("settings-status").classList.add("hidden");
   document.getElementById("settings-token").value = "";
+  document.getElementById("settings-branch").value = getBranch();
 }
 
 // ── GitHub API helpers ─────────────────────────────
@@ -80,6 +87,10 @@ const GH_API = "https://api.github.com";
 
 function getToken() {
   return localStorage.getItem("gh_token") || "";
+}
+
+function getBranch() {
+  return localStorage.getItem("gh_branch") || CONFIG.githubBranch || "main";
 }
 
 function ghHeaders() {
@@ -92,7 +103,7 @@ function ghHeaders() {
 
 async function loadRecipes() {
   try {
-    const url = `${GH_API}/repos/${CONFIG.githubOwner}/${CONFIG.githubRepo}/contents/${CONFIG.dataFile}?ref=${CONFIG.githubBranch}`;
+    const url = `${GH_API}/repos/${CONFIG.githubOwner}/${CONFIG.githubRepo}/contents/${CONFIG.dataFile}?ref=${getBranch()}`;
     const res = await fetch(url, { headers: ghHeaders() });
     if (res.status === 401) {
       showBanner("⚠️ GitHub token is invalid or expired. Open <code>config.js</code> and update <code>githubToken</code>.", "warn");
@@ -122,7 +133,7 @@ async function saveToGitHub() {
   const body = {
     message: "Update recipes",
     content,
-    branch: CONFIG.githubBranch,
+    branch: getBranch(),
   };
   if (fileSha) body.sha = fileSha;
 
@@ -567,7 +578,7 @@ async function saveRecipe() {
 }
 
 async function refreshSha() {
-  const url = `${GH_API}/repos/${CONFIG.githubOwner}/${CONFIG.githubRepo}/contents/${CONFIG.dataFile}?ref=${CONFIG.githubBranch}`;
+  const url = `${GH_API}/repos/${CONFIG.githubOwner}/${CONFIG.githubRepo}/contents/${CONFIG.dataFile}?ref=${getBranch()}`;
   const res = await fetch(url, { headers: ghHeaders() });
   if (res.status === 404) return; // file doesn't exist yet — first save will create it
   if (res.status === 401) throw new Error("Bad credentials — check your GitHub token in config.js");
