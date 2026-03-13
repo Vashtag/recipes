@@ -126,6 +126,15 @@ html, body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+.card-category {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--orange);
+  margin-bottom: 3px;
+}
 .card-source {
   font-size: 0.73rem;
   color: var(--muted);
@@ -449,6 +458,19 @@ html, body {
   padding: 4px 10px;
   font-size: 0.8rem;
   color: var(--muted);
+}
+.meta-chip--category {
+  background: rgba(232,101,42,0.12);
+  border-color: rgba(232,101,42,0.3);
+  color: var(--orange);
+  font-weight: 600;
+}
+.form-row--half {
+  display: flex;
+  gap: 12px;
+}
+.form-row--half .form-group {
+  flex: 1;
 }
 .detail-source-link {
   color: var(--orange);
