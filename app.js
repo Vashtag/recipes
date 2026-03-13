@@ -244,7 +244,7 @@ function renderGrid() {
         : ""}
       <div class="card-img-placeholder" style="${r.image ? "display:none" : ""}">🍽️</div>
       <div class="card-body">
-        ${r.category ? `<span class="card-category">${escHtml(r.category)}</span>` : ""}
+        ${[].concat(r.category||[]).length ? `<span class="card-category">${[].concat(r.category).map(escHtml).join(", ")}</span>` : ""}
         <h3>${escHtml(r.title)}</h3>
         ${r.sourceUrl ? `<p class="card-source">${sourceDomain(r.sourceUrl)}</p>` : ""}
       </div>
@@ -528,7 +528,10 @@ function setFetchLoading(on) {
 function populateEditForm(data) {
   document.getElementById("edit-title").value = data.title || "";
   document.getElementById("edit-image").value = data.image || "";
-  document.getElementById("edit-category").value = data.category || "";
+  const cats = [].concat(data.category || []);
+  document.querySelectorAll("#category-checks input").forEach(cb => {
+    cb.checked = cats.includes(cb.value);
+  });
   document.getElementById("edit-servings").value = data.servings || "";
   document.getElementById("edit-source").value = data.sourceUrl || "";
 
@@ -638,7 +641,7 @@ async function saveRecipe() {
     id: isEdit ? editingId : crypto.randomUUID(),
     title,
     image: document.getElementById("edit-image").value.trim(),
-    category: document.getElementById("edit-category").value,
+    category: [...document.querySelectorAll("#category-checks input:checked")].map(cb => cb.value),
     servings: document.getElementById("edit-servings").value.trim(),
     sourceUrl: document.getElementById("edit-source").value.trim(),
     notes: document.getElementById("edit-notes").value.trim(),
@@ -723,7 +726,7 @@ function openRecipe(id) {
     <div class="detail-hero-placeholder" style="${recipe.image ? "display:none" : ""}">🍽️</div>
 
     <div class="detail-meta">
-      ${recipe.category ? `<span class="meta-chip meta-chip--category">${escHtml(recipe.category)}</span>` : ""}
+      ${[].concat(recipe.category||[]).map(c => `<span class="meta-chip meta-chip--category">${escHtml(c)}</span>`).join("")}
       ${recipe.servings ? `<span class="meta-chip">🍽 ${escHtml(recipe.servings)}</span>` : ""}
       ${recipe.addedAt ? `<span class="meta-chip">📅 ${formatDate(recipe.addedAt)}</span>` : ""}
     </div>

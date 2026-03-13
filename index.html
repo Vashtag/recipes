@@ -80,27 +80,9 @@
           <img id="edit-image-preview" class="image-preview hidden" alt="Preview" />
         </div>
 
-        <div class="form-row form-row--half">
-          <div class="form-group">
-            <label for="edit-category">Category</label>
-            <select id="edit-category">
-              <option value="">— None —</option>
-              <option value="Breakfast">Breakfast</option>
-              <option value="Lunch">Lunch</option>
-              <option value="Dinner">Dinner</option>
-              <option value="Pasta">Pasta</option>
-              <option value="Soup">Soup</option>
-              <option value="Salad">Salad</option>
-              <option value="Snack">Snack</option>
-              <option value="Dessert">Dessert</option>
-              <option value="Drinks">Drinks</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="edit-servings">Servings</label>
-            <input type="text" id="edit-servings" placeholder="e.g. 4 servings" />
-          </div>
+        <div class="form-group">
+          <label for="edit-servings">Servings</label>
+          <input type="text" id="edit-servings" placeholder="e.g. 4 servings" />
         </div>
 
         <div class="form-group">
@@ -123,6 +105,22 @@
         <div class="form-group">
           <label for="edit-notes">Notes</label>
           <textarea id="edit-notes" placeholder="Personal tweaks, substitutions, tips…" rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Categories</label>
+          <div class="category-checks" id="category-checks">
+            <label class="check-item"><input type="checkbox" value="Breakfast" /> Breakfast</label>
+            <label class="check-item"><input type="checkbox" value="Lunch" /> Lunch</label>
+            <label class="check-item"><input type="checkbox" value="Dinner" /> Dinner</label>
+            <label class="check-item"><input type="checkbox" value="Pasta" /> Pasta</label>
+            <label class="check-item"><input type="checkbox" value="Soup" /> Soup</label>
+            <label class="check-item"><input type="checkbox" value="Salad" /> Salad</label>
+            <label class="check-item"><input type="checkbox" value="Snack" /> Snack</label>
+            <label class="check-item"><input type="checkbox" value="Dessert" /> Dessert</label>
+            <label class="check-item"><input type="checkbox" value="Drinks" /> Drinks</label>
+            <label class="check-item"><input type="checkbox" value="Other" /> Other</label>
+          </div>
         </div>
 
         <div class="form-row">
