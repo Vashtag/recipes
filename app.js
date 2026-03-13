@@ -57,22 +57,28 @@ function renderFridgeResults() {
     el.innerHTML = '<p class="fridge-hint">No recipes saved yet.</p>'; return;
   }
 
-  // Support comma-separated terms: "chicken, garlic" matches recipes containing both
+  // Split by comma into individual terms
   const terms = raw.split(",").map(t => t.trim()).filter(Boolean);
 
-  const matches = recipes.filter(r => {
+  // Score each recipe by how many terms appear in its ingredients
+  const scored = recipes.map(r => {
     const ings = (r.ingredients || []).join(" ").toLowerCase();
-    return terms.every(term => ings.includes(term));
-  });
-
-  if (matches.length === 0) {
-    el.innerHTML = `<p class="fridge-hint">No recipes found for "${escHtml(raw)}".</p>`; return;
-  }
-
-  el.innerHTML = matches.map(r => {
+    const matchedTerms = terms.filter(term => ings.includes(term));
     const matchedIngs = (r.ingredients || []).filter(ing =>
       terms.some(term => ing.toLowerCase().includes(term))
     );
+    return { r, matchedTerms, matchedIngs };
+  }).filter(s => s.matchedTerms.length > 0)
+    .sort((a, b) => b.matchedTerms.length - a.matchedTerms.length);
+
+  if (scored.length === 0) {
+    el.innerHTML = `<p class="fridge-hint">No recipes found for "${escHtml(raw)}".</p>`; return;
+  }
+
+  el.innerHTML = scored.map(({ r, matchedTerms, matchedIngs }) => {
+    const label = terms.length > 1
+      ? `${matchedTerms.length}/${terms.length} ingredients matched`
+      : matchedIngs[0] ? escHtml(matchedIngs[0]) : "";
     return `
       <div class="fridge-result-card" onclick="openRecipe('${r.id}')">
         ${r.image
@@ -81,7 +87,7 @@ function renderFridgeResults() {
         <div class="fridge-card-img fridge-card-img--placeholder" style="${r.image ? "display:none" : ""}">🍽️</div>
         <div class="fridge-card-body">
           <h3>${escHtml(r.title)}</h3>
-          <p class="fridge-matched-ings">${matchedIngs.map(i => escHtml(i)).join(", ")}</p>
+          <p class="fridge-matched-ings">${label}</p>
         </div>
       </div>`;
   }).join("");
