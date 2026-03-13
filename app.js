@@ -238,9 +238,6 @@ function renderGrid() {
   const query = document.getElementById("search-input").value.trim().toLowerCase();
   const grid = document.getElementById("recipe-grid");
   const empty = document.getElementById("empty-state");
-  const favSection = document.getElementById("favourites-section");
-  const favGrid = document.getElementById("favourites-grid");
-  const allHeading = document.querySelector(".grid-section-heading--all");
 
   let filtered = recipes;
   if (query) {
@@ -252,26 +249,11 @@ function renderGrid() {
 
   if (filtered.length === 0) {
     grid.innerHTML = "";
-    favSection.classList.add("hidden");
-    allHeading.classList.add("hidden");
     empty.classList.remove("hidden");
     return;
   }
   empty.classList.add("hidden");
-
-  const favs = filtered.filter(r => r.favourite);
-  const rest = filtered.filter(r => !r.favourite);
-
-  if (favs.length > 0) {
-    favSection.classList.remove("hidden");
-    favGrid.innerHTML = favs.map(recipeCardHtml).join("");
-    allHeading.classList.toggle("hidden", rest.length === 0);
-  } else {
-    favSection.classList.add("hidden");
-    allHeading.classList.add("hidden");
-  }
-
-  grid.innerHTML = rest.map(recipeCardHtml).join("");
+  grid.innerHTML = filtered.map(recipeCardHtml).join("");
 }
 
 function renderFavouritesView() {
