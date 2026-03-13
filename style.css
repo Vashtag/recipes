@@ -189,7 +189,7 @@ html, body {
   border-radius: 8px;
   -webkit-tap-highlight-color: transparent;
 }
-.delete-btn { margin-left: auto; }
+.detail-actions { margin-left: auto; display: flex; gap: 4px; }
 
 /* Tab bar */
 .tab-bar {

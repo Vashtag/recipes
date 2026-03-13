@@ -5,6 +5,7 @@
 // ── State ──────────────────────────────────────────
 let recipes = [];          // loaded from GitHub
 let currentRecipeId = null; // recipe open in detail view
+let editingId = null;       // non-null when editing an existing recipe
 let fileSha = null;         // current SHA of recipes.json (needed for GitHub API writes)
 
 // ── Init ───────────────────────────────────────────
@@ -211,7 +212,7 @@ function showView(name) {
     btn.classList.toggle("active", btn.dataset.view === name);
   });
 
-  if (name === "add") resetAddForm();
+  if (name === "add" && !editingId) resetAddForm();
   if (name === "list") renderGrid();
   if (name === "settings") initSettingsView();
 }
@@ -535,6 +536,25 @@ function removeRow(btn) {
   });
 }
 
+// ── Edit existing recipe ───────────────────────────
+function editRecipe() {
+  const recipe = recipes.find(r => r.id === currentRecipeId);
+  if (!recipe) return;
+  editingId = currentRecipeId;
+
+  // Switch to add view in manual tab
+  showView("add");
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === "manual"));
+  document.getElementById("tab-url").classList.add("hidden"); document.getElementById("tab-url").classList.remove("active");
+  document.getElementById("tab-manual").classList.remove("hidden"); document.getElementById("tab-manual").classList.add("active");
+  document.getElementById("edit-form").classList.remove("hidden");
+
+  // Update header to say "Edit Recipe"
+  document.querySelector("#view-add .view-header h2").textContent = "Edit Recipe";
+
+  populateEditForm(recipe);
+}
+
 // ── Save Recipe ────────────────────────────────────
 async function saveRecipe() {
   const errEl = document.getElementById("save-error");
@@ -551,8 +571,11 @@ async function saveRecipe() {
   if (ingredients.length === 0) { showError(errEl, "Add at least one ingredient."); return; }
   if (instructions.length === 0) { showError(errEl, "Add at least one instruction step."); return; }
 
+  const isEdit = !!editingId;
+  const existing = isEdit ? recipes.find(r => r.id === editingId) : null;
+
   const recipe = {
-    id: crypto.randomUUID(),
+    id: isEdit ? editingId : crypto.randomUUID(),
     title,
     image: document.getElementById("edit-image").value.trim(),
     servings: document.getElementById("edit-servings").value.trim(),
@@ -560,19 +583,28 @@ async function saveRecipe() {
     notes: document.getElementById("edit-notes").value.trim(),
     ingredients,
     instructions,
-    addedAt: new Date().toISOString(),
+    addedAt: isEdit ? (existing?.addedAt || new Date().toISOString()) : new Date().toISOString(),
   };
 
   setSaveLoading(true);
+  let rollback;
   try {
-    // Re-fetch SHA in case someone else saved since we loaded
     await refreshSha();
-    recipes.unshift(recipe);
+    if (isEdit) {
+      const idx = recipes.findIndex(r => r.id === editingId);
+      rollback = { type: "edit", idx, original: recipes[idx] };
+      recipes[idx] = recipe;
+    } else {
+      rollback = { type: "add" };
+      recipes.unshift(recipe);
+    }
     await saveToGitHub();
-    showToast("Recipe saved!");
+    editingId = null;
+    showToast(isEdit ? "Recipe updated!" : "Recipe saved!");
     showView("list");
   } catch (e) {
-    recipes.shift(); // rollback
+    if (rollback?.type === "edit") recipes[rollback.idx] = rollback.original;
+    else if (rollback?.type === "add") recipes.shift();
     showError(errEl, `Could not save: ${e.message}`);
   } finally {
     setSaveLoading(false);
@@ -600,6 +632,8 @@ function cancelEdit() {
 }
 
 function resetAddForm() {
+  editingId = null;
+  document.querySelector("#view-add .view-header h2").textContent = "Add Recipe";
   document.getElementById("recipe-url").value = "";
   document.getElementById("fetch-error").classList.add("hidden");
   document.getElementById("edit-form").classList.add("hidden");
