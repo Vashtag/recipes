@@ -790,15 +790,12 @@ async function deleteRecipe() {
   const removed = recipes.splice(idx, 1);
   try {
     await refreshSha();
-    // Remove again after refresh (index may have changed)
-    const idx2 = recipes.findIndex(r => r.id === currentRecipeId);
-    if (idx2 !== -1) recipes.splice(idx2, 1);
     await saveToGitHub();
     showToast("Recipe deleted.");
     showView("list");
   } catch (e) {
     recipes.splice(idx, 0, ...removed); // rollback
-    showToast("Could not delete — try again.");
+    showToast(`Could not delete: ${e.message}`);
   }
 }
 
