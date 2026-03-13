@@ -542,17 +542,16 @@ function editRecipe() {
   if (!recipe) return;
   editingId = currentRecipeId;
 
-  // Switch to add view in manual tab
+  // Go to add view — resetAddForm is skipped because editingId is set
   showView("add");
-  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === "manual"));
-  document.getElementById("tab-url").classList.add("hidden"); document.getElementById("tab-url").classList.remove("active");
-  document.getElementById("tab-manual").classList.remove("hidden"); document.getElementById("tab-manual").classList.add("active");
-  document.getElementById("edit-form").classList.remove("hidden");
 
-  // Update header to say "Edit Recipe"
-  document.querySelector("#view-add .view-header h2").textContent = "Edit Recipe";
+  // Programmatically click the Manual tab to activate it and show the form
+  document.querySelector(".tab-btn[data-tab='manual']").click();
 
+  // Now populate with the recipe's data (overrides the blank clearEditForm)
   populateEditForm(recipe);
+
+  document.querySelector("#view-add .view-header h2").textContent = "Edit Recipe";
 }
 
 // ── Save Recipe ────────────────────────────────────
