@@ -606,43 +606,16 @@ html, body {
   flex-direction: column;
   gap: 14px;
 }
-.fridge-input-row {
-  display: flex;
-  gap: 8px;
-}
-.fridge-input-row input {
-  flex: 1;
-}
 .fridge-hint {
   font-size: 0.88rem;
   color: var(--muted);
   text-align: center;
   padding: 12px 0;
 }
-#fridge-tags {
+#fridge-results {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.fridge-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--surface);
-  border: 1px solid var(--orange);
-  color: var(--orange);
-  border-radius: 50px;
-  padding: 5px 12px;
-  font-size: 0.85rem;
-}
-.fridge-tag-remove {
-  background: none;
-  border: none;
-  color: var(--muted);
-  cursor: pointer;
-  font-size: 0.75rem;
-  padding: 0;
-  line-height: 1;
+  flex-direction: column;
+  gap: 10px;
 }
 .fridge-result-card {
   display: flex;
@@ -662,11 +635,14 @@ html, body {
   flex-shrink: 0;
 }
 .fridge-card-img--placeholder {
+  width: 72px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.6rem;
   background: var(--bg);
+  flex-shrink: 0;
 }
 .fridge-card-body {
   flex: 1;
@@ -677,12 +653,12 @@ html, body {
   font-weight: 600;
   margin-bottom: 4px;
 }
-.fridge-match {
+.fridge-matched-ings {
   font-size: 0.78rem;
-  color: var(--muted);
-}
-.fridge-match--full {
-  color: #80c060;
+  color: var(--orange);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* =====================================================
