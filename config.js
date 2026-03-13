@@ -12,7 +12,7 @@ const CONFIG = {
   githubRepo: "recipes",
 
   // Branch to store data on
-  githubBranch: "master",
+  githubBranch: "main",
 
   // Path to the recipes data file
   dataFile: "data/recipes.json",
