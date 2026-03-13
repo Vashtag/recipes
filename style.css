@@ -473,6 +473,17 @@ html, body {
   display: inline-block;
 }
 
+/* Notes */
+.detail-notes p {
+  font-size: 0.93rem;
+  line-height: 1.6;
+  color: var(--muted);
+  background: var(--bg);
+  border-left: 3px solid var(--orange);
+  padding: 10px 14px;
+  border-radius: 0 8px 8px 0;
+}
+
 /* Ingredients */
 .ingredient-item {
   display: flex;
