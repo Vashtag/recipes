@@ -478,6 +478,7 @@ function populateEditForm(data) {
     imgPreview.classList.add("hidden");
   }
 
+  document.getElementById("edit-notes").value = data.notes || "";
   renderIngredients(data.ingredients || []);
   renderInstructions(data.instructions || []);
 }
@@ -556,6 +557,7 @@ async function saveRecipe() {
     image: document.getElementById("edit-image").value.trim(),
     servings: document.getElementById("edit-servings").value.trim(),
     sourceUrl: document.getElementById("edit-source").value.trim(),
+    notes: document.getElementById("edit-notes").value.trim(),
     ingredients,
     instructions,
     addedAt: new Date().toISOString(),
@@ -630,6 +632,12 @@ function openRecipe(id) {
       ${recipe.addedAt ? `<span class="meta-chip">📅 ${formatDate(recipe.addedAt)}</span>` : ""}
     </div>
     ${recipe.sourceUrl ? `<a class="detail-source-link" href="${escHtml(recipe.sourceUrl)}" target="_blank" rel="noopener">🔗 View original recipe</a>` : ""}
+
+    ${recipe.notes ? `
+    <div class="detail-section detail-notes">
+      <h3>Notes</h3>
+      <p>${escHtml(recipe.notes).replace(/\n/g, "<br>")}</p>
+    </div>` : ""}
 
     <div class="detail-section">
       <h3>Ingredients</h3>
