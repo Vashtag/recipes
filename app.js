@@ -217,10 +217,30 @@ async function saveToGitHub() {
 }
 
 // ── Recipe Grid ────────────────────────────────────
+function recipeCardHtml(r) {
+  return `
+    <div class="recipe-card" onclick="openRecipe('${r.id}')">
+      ${r.favourite ? `<span class="card-fav-star" title="Favourite">★</span>` : ""}
+      ${r.image
+        ? `<img class="card-img" src="${escHtml(r.image)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+        : ""}
+      <div class="card-img-placeholder" style="${r.image ? "display:none" : ""}">🍽️</div>
+      <div class="card-body">
+        ${[].concat(r.category||[]).length ? `<span class="card-category">${[].concat(r.category).map(escHtml).join(", ")}</span>` : ""}
+        <h3>${escHtml(r.title)}</h3>
+        ${r.sourceUrl ? `<p class="card-source">${sourceDomain(r.sourceUrl)}</p>` : ""}
+      </div>
+    </div>
+  `;
+}
+
 function renderGrid() {
   const query = document.getElementById("search-input").value.trim().toLowerCase();
   const grid = document.getElementById("recipe-grid");
   const empty = document.getElementById("empty-state");
+  const favSection = document.getElementById("favourites-section");
+  const favGrid = document.getElementById("favourites-grid");
+  const allHeading = document.querySelector(".grid-section-heading--all");
 
   let filtered = recipes;
   if (query) {
@@ -232,24 +252,26 @@ function renderGrid() {
 
   if (filtered.length === 0) {
     grid.innerHTML = "";
+    favSection.classList.add("hidden");
+    allHeading.classList.add("hidden");
     empty.classList.remove("hidden");
     return;
   }
   empty.classList.add("hidden");
 
-  grid.innerHTML = filtered.map(r => `
-    <div class="recipe-card" onclick="openRecipe('${r.id}')">
-      ${r.image
-        ? `<img class="card-img" src="${escHtml(r.image)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-        : ""}
-      <div class="card-img-placeholder" style="${r.image ? "display:none" : ""}">🍽️</div>
-      <div class="card-body">
-        ${[].concat(r.category||[]).length ? `<span class="card-category">${[].concat(r.category).map(escHtml).join(", ")}</span>` : ""}
-        <h3>${escHtml(r.title)}</h3>
-        ${r.sourceUrl ? `<p class="card-source">${sourceDomain(r.sourceUrl)}</p>` : ""}
-      </div>
-    </div>
-  `).join("");
+  const favs = filtered.filter(r => r.favourite);
+  const rest = filtered.filter(r => !r.favourite);
+
+  if (favs.length > 0) {
+    favSection.classList.remove("hidden");
+    favGrid.innerHTML = favs.map(recipeCardHtml).join("");
+    allHeading.classList.toggle("hidden", rest.length === 0);
+  } else {
+    favSection.classList.add("hidden");
+    allHeading.classList.add("hidden");
+  }
+
+  grid.innerHTML = rest.map(recipeCardHtml).join("");
 }
 
 function sourceDomain(url) {
@@ -533,6 +555,8 @@ function populateEditForm(data) {
     cb.checked = cats.includes(cb.value);
   });
   document.getElementById("edit-servings").value = data.servings || "";
+  document.getElementById("edit-prep-time").value = data.prepTime || "";
+  document.getElementById("edit-cook-time").value = data.cookTime || "";
   document.getElementById("edit-source").value = data.sourceUrl || "";
 
   const imgPreview = document.getElementById("edit-image-preview");
@@ -549,7 +573,7 @@ function populateEditForm(data) {
 }
 
 function clearEditForm() {
-  populateEditForm({ title: "", image: "", servings: "", sourceUrl: "", ingredients: [""], instructions: [""] });
+  populateEditForm({ title: "", image: "", servings: "", prepTime: "", cookTime: "", sourceUrl: "", ingredients: [""], instructions: [""] });
 }
 
 function buildManualForm() {
@@ -643,6 +667,8 @@ async function saveRecipe() {
     image: document.getElementById("edit-image").value.trim(),
     category: [...document.querySelectorAll("#category-checks input:checked")].map(cb => cb.value),
     servings: document.getElementById("edit-servings").value.trim(),
+    prepTime: document.getElementById("edit-prep-time").value.trim(),
+    cookTime: document.getElementById("edit-cook-time").value.trim(),
     sourceUrl: document.getElementById("edit-source").value.trim(),
     notes: document.getElementById("edit-notes").value.trim(),
     ingredients,
@@ -717,6 +743,9 @@ function openRecipe(id) {
   currentRecipeId = id;
 
   document.getElementById("detail-title").textContent = recipe.title;
+  const favBtn = document.getElementById("fav-btn");
+  favBtn.textContent = recipe.favourite ? "★" : "☆";
+  favBtn.classList.toggle("fav-btn--active", !!recipe.favourite);
 
   const content = document.getElementById("detail-content");
   content.innerHTML = `
@@ -728,6 +757,8 @@ function openRecipe(id) {
     <div class="detail-meta">
       ${[].concat(recipe.category||[]).map(c => `<span class="meta-chip meta-chip--category">${escHtml(c)}</span>`).join("")}
       ${recipe.servings ? `<span class="meta-chip">🍽 ${escHtml(recipe.servings)}</span>` : ""}
+      ${recipe.prepTime ? `<span class="meta-chip">⏱ Prep: ${escHtml(recipe.prepTime)}</span>` : ""}
+      ${recipe.cookTime ? `<span class="meta-chip">🔥 Cook: ${escHtml(recipe.cookTime)}</span>` : ""}
       ${recipe.addedAt ? `<span class="meta-chip">📅 ${formatDate(recipe.addedAt)}</span>` : ""}
     </div>
     ${recipe.sourceUrl ? `<a class="detail-source-link" href="${escHtml(recipe.sourceUrl)}" target="_blank" rel="noopener">🔗 View original recipe</a>` : ""}
@@ -774,6 +805,28 @@ function formatDate(iso) {
 }
 
 // ── Delete ─────────────────────────────────────────
+// ── Favourite ──────────────────────────────────────
+async function toggleFavourite() {
+  const recipe = recipes.find(r => r.id === currentRecipeId);
+  if (!recipe) return;
+  recipe.favourite = !recipe.favourite;
+
+  const favBtn = document.getElementById("fav-btn");
+  favBtn.textContent = recipe.favourite ? "★" : "☆";
+  favBtn.classList.toggle("fav-btn--active", recipe.favourite);
+
+  try {
+    await refreshSha();
+    await saveToGitHub();
+    showToast(recipe.favourite ? "Added to favourites." : "Removed from favourites.");
+  } catch (e) {
+    recipe.favourite = !recipe.favourite; // rollback
+    favBtn.textContent = recipe.favourite ? "★" : "☆";
+    favBtn.classList.toggle("fav-btn--active", recipe.favourite);
+    showToast(`Could not save: ${e.message}`);
+  }
+}
+
 function confirmDelete() {
   document.getElementById("delete-modal").classList.remove("hidden");
 }

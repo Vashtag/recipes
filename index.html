@@ -26,7 +26,14 @@
 
     <!-- VIEW: Recipe List -->
     <main id="view-list" class="view active">
-      <div id="recipe-grid"></div>
+      <div id="favourites-section" class="hidden">
+        <h3 class="grid-section-heading">★ Favourites</h3>
+        <div id="favourites-grid"></div>
+      </div>
+      <div id="all-section">
+        <h3 class="grid-section-heading grid-section-heading--all hidden">All Recipes</h3>
+        <div id="recipe-grid"></div>
+      </div>
       <div id="empty-state" class="empty-state hidden">
         <span class="empty-icon">🍽️</span>
         <p>No recipes yet.<br>Tap <strong>+</strong> to add one!</p>
@@ -80,9 +87,19 @@
           <img id="edit-image-preview" class="image-preview hidden" alt="Preview" />
         </div>
 
-        <div class="form-group">
-          <label for="edit-servings">Servings</label>
-          <input type="text" id="edit-servings" placeholder="e.g. 4 servings" />
+        <div class="form-group form-group--row">
+          <div>
+            <label for="edit-servings">Servings</label>
+            <input type="text" id="edit-servings" placeholder="e.g. 4" />
+          </div>
+          <div>
+            <label for="edit-prep-time">Prep time</label>
+            <input type="text" id="edit-prep-time" placeholder="e.g. 15 mins" />
+          </div>
+          <div>
+            <label for="edit-cook-time">Cook time</label>
+            <input type="text" id="edit-cook-time" placeholder="e.g. 30 mins" />
+          </div>
         </div>
 
         <div class="form-group">
@@ -140,6 +157,7 @@
         <button class="back-btn" onclick="showView('list')">← Back</button>
         <h2 id="detail-title"></h2>
         <div class="detail-actions">
+          <button class="icon-btn fav-btn" id="fav-btn" onclick="toggleFavourite()" title="Favourite recipe">☆</button>
           <button class="icon-btn edit-btn" onclick="editRecipe()" title="Edit recipe">✏️</button>
           <button class="icon-btn delete-btn" onclick="confirmDelete()" title="Delete recipe">🗑</button>
         </div>
