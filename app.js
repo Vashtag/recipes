@@ -49,24 +49,30 @@ function initFridgeView() {
 }
 
 function renderFridgeResults() {
-  const query = document.getElementById("fridge-input").value.trim().toLowerCase();
+  const raw = document.getElementById("fridge-input").value.trim().toLowerCase();
   const el = document.getElementById("fridge-results");
 
-  if (!query) { el.innerHTML = ""; return; }
+  if (!raw) { el.innerHTML = ""; return; }
   if (recipes.length === 0) {
     el.innerHTML = '<p class="fridge-hint">No recipes saved yet.</p>'; return;
   }
 
-  const matches = recipes.filter(r =>
-    (r.ingredients || []).some(ing => ing.toLowerCase().includes(query))
-  );
+  // Support comma-separated terms: "chicken, garlic" matches recipes containing both
+  const terms = raw.split(",").map(t => t.trim()).filter(Boolean);
+
+  const matches = recipes.filter(r => {
+    const ings = (r.ingredients || []).join(" ").toLowerCase();
+    return terms.every(term => ings.includes(term));
+  });
 
   if (matches.length === 0) {
-    el.innerHTML = `<p class="fridge-hint">No recipes use "${escHtml(query)}".</p>`; return;
+    el.innerHTML = `<p class="fridge-hint">No recipes found for "${escHtml(raw)}".</p>`; return;
   }
 
   el.innerHTML = matches.map(r => {
-    const matchedIngs = (r.ingredients || []).filter(ing => ing.toLowerCase().includes(query));
+    const matchedIngs = (r.ingredients || []).filter(ing =>
+      terms.some(term => ing.toLowerCase().includes(term))
+    );
     return `
       <div class="fridge-result-card" onclick="openRecipe('${r.id}')">
         ${r.image
@@ -137,12 +143,15 @@ function getBranch() {
   return localStorage.getItem("gh_branch") || CONFIG.githubBranch || "main";
 }
 
-function ghHeaders() {
-  return {
-    Authorization: `token ${getToken()}`,
+function ghHeaders(write = false) {
+  const token = getToken();
+  const headers = {
     Accept: "application/vnd.github.v3+json",
     "Content-Type": "application/json",
   };
+  // Only add auth if we have a token, or if it's a write operation (required)
+  if (token || write) headers.Authorization = `token ${token}`;
+  return headers;
 }
 
 async function loadRecipes() {
@@ -183,7 +192,7 @@ async function saveToGitHub() {
 
   const res = await fetch(url, {
     method: "PUT",
-    headers: ghHeaders(),
+    headers: ghHeaders(true),
     body: JSON.stringify(body),
   });
   if (!res.ok) {
