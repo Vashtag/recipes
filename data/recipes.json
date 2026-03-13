@@ -1,5 +1,45 @@
 [
   {
+    "id": "ac53cdbb-6f1f-4a1d-a460-cf06826fafa2",
+    "title": "Marry Me Chicken",
+    "image": "https://littlesunnykitchen.com/wp-content/uploads/Marry-Me-Chicken-22-480x270.jpg",
+    "category": [
+      "Dinner"
+    ],
+    "servings": "6",
+    "prepTime": "10 mins",
+    "cookTime": "15 mins",
+    "sourceUrl": "https://littlesunnykitchen.com/marry-me-chicken/",
+    "notes": "",
+    "ingredients": [
+      "3 large chicken breasts",
+      "½ teaspoon salt",
+      "¼ teaspoon ground black pepper",
+      "6 tablespoons all-purpose flour",
+      "2 tablespoons olive oil",
+      "2 tablespoons unsalted butter",
+      "3 cloves garlic (minced)",
+      "1 cup chicken stock",
+      "1 cup heavy cream ((double cream in the UK))",
+      "½ cup grated parmesan cheese",
+      "1 teaspoon chili flakes",
+      "¼ teaspoon oregano",
+      "¼ teaspoon thyme",
+      "⅓ cup sundried tomatoes (chopped)",
+      "1 tablespoon fresh basil leaves"
+    ],
+    "instructions": [
+      "Season chicken with salt and pepper, then dredge in flour and shake off any excess.",
+      "In a large skillet, heat olive oil and melt the butter on medium heat. Swirl pan to coat with oil and butter evenly.",
+      "Brown the chicken (do not overcrowd and work in batches if needed) for 4-5 minutes on each side or until golden brown and cooked through. Transfer onto a plate, cover, and set aside.",
+      "Saute the garlic for a minute or until it&#039;s fragrant. Add the chicken stock, and deglaze the pan scraping any bits stuck to the bottom of the pan with a wooden spoon.",
+      "Adjust the heat to medium-low, and add the heavy cream and the parmesan cheese to the skillet. Allow the sauce to simmer for a couple of minutes, then season with chili flakes, thyme, and oregano.",
+      "Season with salt and pepper to your taste, add the sundried tomatoes then put the chicken back in the sauce and let the sauce simmer and thicken for a few more minutes.",
+      "Garnish with chopped fresh basil leaves and serve warm over pasta or rice."
+    ],
+    "addedAt": "2026-03-13T19:12:30.517Z"
+  },
+  {
     "id": "573f4066-eb50-47a9-88df-84a78a8c026a",
     "title": "Tiramisu",
     "image": "https://tastesbetterfromscratch.com/wp-content/uploads/2017/04/Tiramisu-15-480x270.jpg",
