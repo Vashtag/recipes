@@ -86,7 +86,7 @@ function initSettingsView() {
 const GH_API = "https://api.github.com";
 
 function getToken() {
-  return localStorage.getItem("gh_token") || "";
+  return localStorage.getItem("gh_token") || CONFIG.githubToken || "";
 }
 
 function getBranch() {
