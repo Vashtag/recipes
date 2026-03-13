@@ -533,6 +533,8 @@ function populateEditForm(data) {
     cb.checked = cats.includes(cb.value);
   });
   document.getElementById("edit-servings").value = data.servings || "";
+  document.getElementById("edit-prep-time").value = data.prepTime || "";
+  document.getElementById("edit-cook-time").value = data.cookTime || "";
   document.getElementById("edit-source").value = data.sourceUrl || "";
 
   const imgPreview = document.getElementById("edit-image-preview");
@@ -549,7 +551,7 @@ function populateEditForm(data) {
 }
 
 function clearEditForm() {
-  populateEditForm({ title: "", image: "", servings: "", sourceUrl: "", ingredients: [""], instructions: [""] });
+  populateEditForm({ title: "", image: "", servings: "", prepTime: "", cookTime: "", sourceUrl: "", ingredients: [""], instructions: [""] });
 }
 
 function buildManualForm() {
@@ -643,6 +645,8 @@ async function saveRecipe() {
     image: document.getElementById("edit-image").value.trim(),
     category: [...document.querySelectorAll("#category-checks input:checked")].map(cb => cb.value),
     servings: document.getElementById("edit-servings").value.trim(),
+    prepTime: document.getElementById("edit-prep-time").value.trim(),
+    cookTime: document.getElementById("edit-cook-time").value.trim(),
     sourceUrl: document.getElementById("edit-source").value.trim(),
     notes: document.getElementById("edit-notes").value.trim(),
     ingredients,
@@ -728,6 +732,8 @@ function openRecipe(id) {
     <div class="detail-meta">
       ${[].concat(recipe.category||[]).map(c => `<span class="meta-chip meta-chip--category">${escHtml(c)}</span>`).join("")}
       ${recipe.servings ? `<span class="meta-chip">🍽 ${escHtml(recipe.servings)}</span>` : ""}
+      ${recipe.prepTime ? `<span class="meta-chip">⏱ Prep: ${escHtml(recipe.prepTime)}</span>` : ""}
+      ${recipe.cookTime ? `<span class="meta-chip">🔥 Cook: ${escHtml(recipe.cookTime)}</span>` : ""}
       ${recipe.addedAt ? `<span class="meta-chip">📅 ${formatDate(recipe.addedAt)}</span>` : ""}
     </div>
     ${recipe.sourceUrl ? `<a class="detail-source-link" href="${escHtml(recipe.sourceUrl)}" target="_blank" rel="noopener">🔗 View original recipe</a>` : ""}

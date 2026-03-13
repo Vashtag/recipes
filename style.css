@@ -589,6 +589,40 @@ html, body {
 .form-row--half .form-group {
   flex: 1;
 }
+.form-group--row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.form-group--row > div {
+  flex: 1;
+}
+.form-group--row label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted2);
+  margin-bottom: 7px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.form-group--row input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border2);
+  border-radius: var(--radius-sm);
+  background: var(--surface2);
+  font-size: 1rem;
+  color: var(--text);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-group--row input::placeholder { color: var(--muted); }
+.form-group--row input:focus {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px var(--orange-glow);
+}
 
 /* Category checkboxes */
 .category-checks {
