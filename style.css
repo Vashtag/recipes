@@ -598,6 +598,94 @@ html, body {
 .nav-btn.add-btn span:last-child { color: var(--muted); }
 
 /* =====================================================
+   FRIDGE VIEW
+   ===================================================== */
+.fridge-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.fridge-input-row {
+  display: flex;
+  gap: 8px;
+}
+.fridge-input-row input {
+  flex: 1;
+}
+.fridge-hint {
+  font-size: 0.88rem;
+  color: var(--muted);
+  text-align: center;
+  padding: 12px 0;
+}
+#fridge-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.fridge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--orange);
+  color: var(--orange);
+  border-radius: 50px;
+  padding: 5px 12px;
+  font-size: 0.85rem;
+}
+.fridge-tag-remove {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0;
+  line-height: 1;
+}
+.fridge-result-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.fridge-card-img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.fridge-card-img--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  background: var(--bg);
+}
+.fridge-card-body {
+  flex: 1;
+  padding: 10px 12px 10px 0;
+}
+.fridge-card-body h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.fridge-match {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.fridge-match--full {
+  color: #80c060;
+}
+
+/* =====================================================
    SETTINGS VIEW
    ===================================================== */
 .settings-body {

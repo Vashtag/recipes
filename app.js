@@ -42,6 +42,79 @@ function showBanner(html, type = "warn") {
   banner.innerHTML = html;
 }
 
+// ── Fridge (ingredient-based recipe finder) ────────
+let fridgeTags = [];
+
+function initFridgeView() {
+  renderFridgeTags();
+  renderFridgeResults();
+}
+
+function addFridgeTag() {
+  const input = document.getElementById("fridge-input");
+  const val = input.value.trim().toLowerCase();
+  if (val && !fridgeTags.includes(val)) {
+    fridgeTags.push(val);
+    renderFridgeTags();
+    renderFridgeResults();
+  }
+  input.value = "";
+  input.focus();
+}
+
+function removeFridgeTag(tag) {
+  fridgeTags = fridgeTags.filter(t => t !== tag);
+  renderFridgeTags();
+  renderFridgeResults();
+}
+
+function renderFridgeTags() {
+  const el = document.getElementById("fridge-tags");
+  if (fridgeTags.length === 0) {
+    el.innerHTML = '<p class="fridge-hint">Add ingredients above to find matching recipes.</p>';
+    return;
+  }
+  el.innerHTML = fridgeTags.map(tag => `
+    <span class="fridge-tag">${escHtml(tag)}<button onclick="removeFridgeTag('${escHtml(tag)}')" class="fridge-tag-remove">✕</button></span>
+  `).join("");
+}
+
+function renderFridgeResults() {
+  const el = document.getElementById("fridge-results");
+  if (fridgeTags.length === 0) { el.innerHTML = ""; return; }
+  if (recipes.length === 0) { el.innerHTML = '<p class="fridge-hint">No recipes saved yet.</p>'; return; }
+
+  const scored = recipes.map(r => {
+    const recipeIngredients = (r.ingredients || []).join(" ").toLowerCase();
+    const matched = fridgeTags.filter(tag => recipeIngredients.includes(tag));
+    return { recipe: r, matched: matched.length, total: fridgeTags.length };
+  }).filter(s => s.matched > 0)
+    .sort((a, b) => b.matched - a.matched || a.recipe.title.localeCompare(b.recipe.title));
+
+  if (scored.length === 0) {
+    el.innerHTML = '<p class="fridge-hint">No recipes match your ingredients yet.</p>';
+    return;
+  }
+
+  el.innerHTML = scored.map(({ recipe: r, matched, total }) => `
+    <div class="fridge-result-card" onclick="openRecipe('${r.id}')">
+      ${r.image ? `<img class="fridge-card-img" src="${escHtml(r.image)}" alt="" loading="lazy" onerror="this.style.display='none'">` : `<div class="fridge-card-img fridge-card-img--placeholder">🍽️</div>`}
+      <div class="fridge-card-body">
+        <h3>${escHtml(r.title)}</h3>
+        <div class="fridge-match ${matched === total ? 'fridge-match--full' : ''}">
+          ${matched === total ? '✅' : '🟡'} ${matched} of ${total} ingredient${total > 1 ? 's' : ''} matched
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("fridge-input").addEventListener("keydown", e => {
+    if (e.key === "Enter") { e.preventDefault(); addFridgeTag(); }
+  });
+});
+
 // ── Settings ───────────────────────────────────────
 function saveSettings() {
   const token = document.getElementById("settings-token").value.trim();
@@ -215,6 +288,7 @@ function showView(name) {
   if (name === "add" && !editingId) resetAddForm();
   if (name === "list") renderGrid();
   if (name === "settings") initSettingsView();
+  if (name === "fridge") initFridgeView();
 }
 
 // ── Tabs (URL / Manual) ────────────────────────────
