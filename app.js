@@ -802,6 +802,62 @@ function formatDate(iso) {
   catch { return ""; }
 }
 
+// ── Cook Mode ──────────────────────────────────────
+let wakeLock = null;
+
+async function enterCookMode() {
+  const recipe = recipes.find(r => r.id === currentRecipeId);
+  if (!recipe) return;
+
+  document.getElementById("cook-mode-title").textContent = recipe.title;
+
+  document.getElementById("cook-ingredients").innerHTML = recipe.ingredients.map((ing, i) => `
+    <div class="cook-ingredient" onclick="this.classList.toggle('checked')" data-index="${i}">
+      <div class="ingredient-cb"></div>
+      <span>${escHtml(ing)}</span>
+    </div>
+  `).join("");
+
+  document.getElementById("cook-steps").innerHTML = recipe.instructions.map((step, i) => `
+    <div class="cook-step" onclick="this.classList.toggle('done')">
+      <div class="step-num">${i + 1}</div>
+      <div>${escHtml(step)}</div>
+    </div>
+  `).join("");
+
+  document.getElementById("cook-mode").classList.remove("hidden");
+  document.body.classList.add("cook-mode-open");
+
+  // Request Wake Lock to keep screen on
+  if ("wakeLock" in navigator) {
+    try {
+      wakeLock = await navigator.wakeLock.request("screen");
+      document.getElementById("cook-wakelock-badge").classList.remove("hidden");
+      wakeLock.addEventListener("release", () => {
+        document.getElementById("cook-wakelock-badge").classList.add("hidden");
+      });
+    } catch (e) {
+      // Wake Lock not granted — silently continue
+    }
+  }
+}
+
+function exitCookMode() {
+  document.getElementById("cook-mode").classList.add("hidden");
+  document.body.classList.remove("cook-mode-open");
+  if (wakeLock) {
+    wakeLock.release();
+    wakeLock = null;
+  }
+}
+
+// Re-acquire wake lock if page becomes visible again while cook mode is open
+document.addEventListener("visibilitychange", async () => {
+  if (wakeLock !== null && document.visibilityState === "visible") {
+    try { wakeLock = await navigator.wakeLock.request("screen"); } catch (e) {}
+  }
+});
+
 // ── Delete ─────────────────────────────────────────
 // ── Favourite ──────────────────────────────────────
 async function toggleFavourite() {

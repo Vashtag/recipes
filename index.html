@@ -156,6 +156,7 @@
           <button class="icon-btn fav-btn" id="fav-btn" onclick="toggleFavourite()" title="Favourite recipe">☆</button>
           <button class="icon-btn edit-btn" onclick="editRecipe()" title="Edit recipe">✏️</button>
           <button class="icon-btn delete-btn" onclick="confirmDelete()" title="Delete recipe">🗑</button>
+          <button class="cook-btn" onclick="enterCookMode()" title="Cook this recipe">👨‍🍳 Cook</button>
         </div>
       </div>
       <div id="detail-content"></div>
@@ -247,6 +248,26 @@
         <button class="btn-danger" onclick="deleteRecipe()">Delete</button>
       </div>
     </div>
+  </div>
+
+  <!-- COOK MODE OVERLAY -->
+  <div id="cook-mode" class="cook-mode hidden">
+    <div class="cook-mode-header">
+      <h2 id="cook-mode-title"></h2>
+      <button class="cook-mode-exit-btn" onclick="exitCookMode()" title="Exit cook mode">✕ Exit</button>
+    </div>
+    <div class="cook-mode-body">
+      <div class="cook-mode-col" id="cook-ingredients-col">
+        <h3>Ingredients</h3>
+        <div id="cook-ingredients"></div>
+      </div>
+      <div class="cook-mode-divider"></div>
+      <div class="cook-mode-col" id="cook-steps-col">
+        <h3>Instructions</h3>
+        <div id="cook-steps"></div>
+      </div>
+    </div>
+    <div id="cook-wakelock-badge" class="cook-wakelock-badge hidden" title="Screen kept awake">☀ Screen awake</div>
   </div>
 
   <!-- TOAST -->
