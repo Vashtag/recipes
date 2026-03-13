@@ -472,6 +472,33 @@ html, body {
 .form-row--half .form-group {
   flex: 1;
 }
+.category-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.check-item:has(input:checked) {
+  border-color: var(--orange);
+  background: rgba(232,101,42,0.1);
+  color: var(--orange);
+}
+.check-item input[type="checkbox"] {
+  display: none;
+}
 .detail-source-link {
   color: var(--orange);
   text-decoration: none;
