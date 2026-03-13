@@ -17,7 +17,7 @@
     <!-- TOP HEADER (visible on list view) -->
     <header id="main-header">
       <h1>Our Recipes</h1>
-      <div class="header-search">
+      <div class="header-search search-wrap">
         <input type="search" id="search-input" placeholder="Search recipes…" autocomplete="off" />
       </div>
     </header>
@@ -153,7 +153,9 @@
         <h2>What Can I Make?</h2>
       </div>
       <div class="fridge-body">
-        <input type="search" id="fridge-input" placeholder="e.g. chicken, garlic, lemon…" autocomplete="off" />
+        <div class="search-wrap">
+          <input type="search" id="fridge-input" placeholder="e.g. chicken, garlic, lemon…" autocomplete="off" />
+        </div>
         <div id="fridge-results"></div>
       </div>
     </main>
