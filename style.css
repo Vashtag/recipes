@@ -54,12 +54,22 @@ html, body {
   z-index: 10;
 }
 
+.header-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
 #main-header h1 {
   font-size: 1.5rem;
   font-weight: 800;
   color: var(--orange);
-  margin-bottom: 10px;
   letter-spacing: -0.02em;
+}
+.settings-top-btn {
+  font-size: 1.4rem;
+  padding: 4px 6px;
+  line-height: 1;
 }
 
 /* =====================================================

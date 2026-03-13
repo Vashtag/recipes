@@ -14,9 +14,12 @@
   <!-- ==================== APP SHELL ==================== -->
   <div id="app">
 
-    <!-- TOP HEADER (visible on list view) -->
+    <!-- TOP HEADER (visible on list/favourites view) -->
     <header id="main-header">
-      <h1>Our Recipes</h1>
+      <div class="header-top-row">
+        <h1>Our Recipes</h1>
+        <button class="icon-btn settings-top-btn" onclick="showView('settings')" title="Settings">⚙️</button>
+      </div>
       <div class="header-search search-wrap">
         <input type="search" id="search-input" placeholder="Search recipes…" autocomplete="off" />
       </div>
@@ -212,6 +215,15 @@
       </div>
     </main>
 
+    <!-- VIEW: Favourites -->
+    <main id="view-favourites" class="view hidden">
+      <div id="favourites-view-grid"></div>
+      <div id="favourites-empty" class="empty-state hidden">
+        <span class="empty-icon">☆</span>
+        <p>No favourites yet.<br>Tap <strong>☆</strong> on a recipe to save it here.</p>
+      </div>
+    </main>
+
     <!-- BOTTOM NAV -->
     <nav id="bottom-nav">
       <button class="nav-btn active" data-view="list" onclick="showView('list')">
@@ -226,9 +238,9 @@
         <span class="nav-icon">🧑‍🍳</span>
         <span>Fridge</span>
       </button>
-      <button class="nav-btn" data-view="settings" onclick="showView('settings')">
-        <span class="nav-icon">⚙️</span>
-        <span>Settings</span>
+      <button class="nav-btn" data-view="favourites" onclick="showView('favourites')">
+        <span class="nav-icon">★</span>
+        <span>Favourites</span>
       </button>
     </nav>
   </div>

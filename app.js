@@ -274,6 +274,19 @@ function renderGrid() {
   grid.innerHTML = rest.map(recipeCardHtml).join("");
 }
 
+function renderFavouritesView() {
+  const grid = document.getElementById("favourites-view-grid");
+  const empty = document.getElementById("favourites-empty");
+  const favs = recipes.filter(r => r.favourite);
+  if (favs.length === 0) {
+    grid.innerHTML = "";
+    empty.classList.remove("hidden");
+    return;
+  }
+  empty.classList.add("hidden");
+  grid.innerHTML = favs.map(recipeCardHtml).join("");
+}
+
 function sourceDomain(url) {
   try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return url; }
 }
@@ -285,8 +298,10 @@ function showView(name) {
     v.classList.toggle("hidden", v.id !== `view-${name}`);
   });
 
-  // Show/hide main header
-  document.getElementById("main-header").style.display = name === "list" ? "" : "none";
+  // Show/hide main header (visible on list and favourites)
+  document.getElementById("main-header").style.display = (name === "list" || name === "favourites") ? "" : "none";
+  // Search bar only useful on list view
+  document.querySelector(".header-search").style.display = name === "list" ? "" : "none";
 
   // Update nav active state
   document.querySelectorAll(".nav-btn[data-view]").forEach(btn => {
@@ -295,6 +310,7 @@ function showView(name) {
 
   if (name === "add" && !editingId) resetAddForm();
   if (name === "list") renderGrid();
+  if (name === "favourites") renderFavouritesView();
   if (name === "settings") initSettingsView();
   if (name === "fridge") initFridgeView();
 }
