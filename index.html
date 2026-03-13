@@ -143,9 +143,15 @@
           </p>
         </div>
 
+        <div class="form-group">
+          <label for="settings-branch">Branch</label>
+          <input type="text" id="settings-branch" placeholder="main" autocomplete="off" />
+          <p class="field-hint">The branch your recipes are saved to (usually <code>main</code>).</p>
+        </div>
+
         <div class="form-row">
           <button class="btn-secondary" id="settings-clear-btn" onclick="clearToken()">Clear Token</button>
-          <button class="btn-primary" onclick="saveToken()">Save Token</button>
+          <button class="btn-primary" onclick="saveSettings()">Save</button>
         </div>
         <p id="settings-status" class="settings-status hidden"></p>
       </div>
