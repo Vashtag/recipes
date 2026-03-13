@@ -123,7 +123,10 @@
       <div class="view-header sticky-header" id="detail-header">
         <button class="back-btn" onclick="showView('list')">← Back</button>
         <h2 id="detail-title"></h2>
-        <button class="icon-btn delete-btn" onclick="confirmDelete()" title="Delete recipe">🗑</button>
+        <div class="detail-actions">
+          <button class="icon-btn edit-btn" onclick="editRecipe()" title="Edit recipe">✏️</button>
+          <button class="icon-btn delete-btn" onclick="confirmDelete()" title="Delete recipe">🗑</button>
+        </div>
       </div>
       <div id="detail-content"></div>
     </main>
