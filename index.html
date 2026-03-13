@@ -131,6 +131,21 @@
       <div id="detail-content"></div>
     </main>
 
+    <!-- VIEW: Fridge (ingredient-based search) -->
+    <main id="view-fridge" class="view hidden">
+      <div class="view-header">
+        <h2>What Can I Make?</h2>
+      </div>
+      <div class="fridge-body">
+        <div class="fridge-input-row">
+          <input type="text" id="fridge-input" placeholder="Type an ingredient and press Enter…" autocomplete="off" />
+          <button class="btn-primary small" onclick="addFridgeTag()">Add</button>
+        </div>
+        <div id="fridge-tags"></div>
+        <div id="fridge-results"></div>
+      </div>
+    </main>
+
     <!-- VIEW: Settings -->
     <main id="view-settings" class="view hidden">
       <div class="view-header">
@@ -174,6 +189,10 @@
       <button class="nav-btn add-btn" onclick="showView('add')">
         <span class="nav-icon">＋</span>
         <span>Add</span>
+      </button>
+      <button class="nav-btn" data-view="fridge" onclick="showView('fridge')">
+        <span class="nav-icon">🧑‍🍳</span>
+        <span>Fridge</span>
       </button>
       <button class="nav-btn" data-view="settings" onclick="showView('settings')">
         <span class="nav-icon">⚙️</span>
