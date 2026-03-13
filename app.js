@@ -106,7 +106,7 @@ async function loadRecipes() {
     const url = `${GH_API}/repos/${CONFIG.githubOwner}/${CONFIG.githubRepo}/contents/${CONFIG.dataFile}?ref=${getBranch()}`;
     const res = await fetch(url, { headers: ghHeaders() });
     if (res.status === 401) {
-      showBanner("⚠️ GitHub token is invalid or expired. Open <code>config.js</code> and update <code>githubToken</code>.", "warn");
+      showBanner("⚠️ GitHub token is invalid or expired. Go to <strong>⚙️ Settings</strong> to update it.", "warn");
       recipes = []; fileSha = null;
       renderGrid(); return;
     }
@@ -146,7 +146,7 @@ async function saveToGitHub() {
     let msg = `GitHub API error ${res.status}`;
     try {
       const err = await res.json();
-      if (res.status === 401) msg = "Bad credentials — check your GitHub token in config.js";
+      if (res.status === 401) msg = "Bad credentials — update your token in ⚙️ Settings";
       else if (res.status === 409) msg = "Conflict: someone else saved at the same time. Please reload and try again.";
       else if (res.status === 422) msg = "GitHub rejected the update (422). Check your token permissions (needs Contents: Read & Write).";
       else msg = err.message || msg;
@@ -583,7 +583,7 @@ async function refreshSha() {
   const url = `${GH_API}/repos/${CONFIG.githubOwner}/${CONFIG.githubRepo}/contents/${CONFIG.dataFile}?ref=${getBranch()}`;
   const res = await fetch(url, { headers: ghHeaders() });
   if (res.status === 404) return; // file doesn't exist yet — first save will create it
-  if (res.status === 401) throw new Error("Bad credentials — check your GitHub token in config.js");
+  if (res.status === 401) throw new Error("Bad credentials — update your token in ⚙️ Settings");
   if (!res.ok) throw new Error(`GitHub API error ${res.status} while fetching latest data`);
   const data = await res.json();
   fileSha = data.sha;
