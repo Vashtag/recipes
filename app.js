@@ -177,7 +177,7 @@ async function loadRecipes() {
     if (!res.ok) throw new Error(`GitHub API error ${res.status}`);
     const data = await res.json();
     fileSha = data.sha;
-    recipes = JSON.parse(atob(data.content.replace(/\n/g, "")));
+    recipes = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\n/g, "")))));
   } catch (e) {
     console.warn("Could not load recipes:", e.message);
     recipes = [];
