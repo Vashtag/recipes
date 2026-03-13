@@ -1,17 +1,10 @@
 // ============================================================
-// SETUP REQUIRED — fill in these values before using the app
-// ============================================================
-// 1. Go to GitHub → Settings → Developer Settings
-//    → Personal Access Tokens → Fine-grained tokens → Generate new token
-// 2. Set repository access to ONLY this repo
-// 3. Under "Repository permissions" set Contents → Read and Write
-// 4. Copy the token and paste it below
+// App config — safe to commit (no secrets here)
+// The GitHub token is stored in your browser's localStorage.
+// Open the Settings tab in the app to enter it.
 // ============================================================
 
 const CONFIG = {
-  // Your GitHub Personal Access Token (fine-grained, Contents: Read+Write)
-  githubToken: "YOUR_GITHUB_TOKEN_HERE",
-
   // Your GitHub username
   githubOwner: "Vashtag",
 
