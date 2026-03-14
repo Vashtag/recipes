@@ -1,32 +1,35 @@
 [
   {
-    "id": "e8fa4cab-5e2d-4af7-a165-df7fb54d80db",
-    "title": "Best Damn Air Fryer Pork Tenderloin",
-    "image": "https://recipeteacher.com/wp-content/uploads/2019/12/best-damn-air-fryer-pork-tenderloin-8-1.jpg",
+    "id": "c45b8322-0d84-4b24-be1d-148ca0b13959",
+    "title": "Kabab Tabei - Persian Pan Kebab",
+    "image": "https://www.unicornsinthekitchen.com/wp-content/uploads/2019/01/Kabab-tabei-1200-x-1800-px-2-1-480x270.jpg",
     "category": [],
-    "servings": "4 servings",
+    "servings": "4",
     "prepTime": "",
     "cookTime": "",
-    "sourceUrl": "https://recipeteacher.com/best-damn-air-fryer-pork-tenderloin/",
+    "sourceUrl": "https://www.unicornsinthekitchen.com/kabab-tabei-persian-pan-kebab/",
     "notes": "",
     "ingredients": [
-      "Pork tenderloin (1.25lbs &#8211; 1.75lbs)",
-      "1 tbs smoked paprika",
-      "1.5 tsp salt",
-      "1 tsp ground mustard",
-      "1/2 tsp onion powder",
-      "1/2 tsp ground black pepper",
-      "1/4 tsp garlic powder",
-      "1/4 tsp cayenne powder (optional)",
-      "1/2 tbs olive oil"
+      "1 lb ground beef (93% lean is the best)",
+      "1 medium onion",
+      "1 tsp turmeric",
+      "1 tsp salt",
+      "1/2 tsp black pepper",
+      "2 to matoes (cut into quarters)"
     ],
     "instructions": [
-      "Mix all dry ingredients in a bowl.",
-      "Trim the pork tenderloin of any excess fat/silver skin. Coat with a 1/2 tablespoon olive oil. Rub spice mixture on entire pork tenderloin.",
-      "Preheat air fryer to 400° F for 5 minutes. After 5 minutes, carefully place pork tenderloin into air fryer and air fry at 400° F for 20-22 minutes. Internal temp should be 145°F.",
-      "When air fryer cycle is complete, carefully remove pork tenderloin to a cutting board and let rest for 5 minutes before slicing. Save any juices to serve over sliced meat."
+      "Grate the onion and squeeze fully so the juice is all out. Discard the juice.",
+      "Put ground beef in a bowl, add grated onion and spiced to it. Mix and knead very well.*",
+      "Coat the bottom of a pan using one tablespoon olive oil.",
+      "Spread the beef mixture in the pan using a spatula or just your hands.",
+      "Using a spatula, divide the mixture into strips.",
+      "Place the pan on medium heat and cover with a lid.",
+      "When it starts to release its juice, uncover and let the juice evaporate.",
+      "Flip the kebabs using a spatula and let the other side brown, too.",
+      "In a small pan, heat some olive oil and fry the tomatoes.",
+      "Serve with white and saffron rice."
     ],
-    "addedAt": "2026-03-14T00:12:05.663Z"
+    "addedAt": "2026-03-14T00:13:10.271Z"
   },
   {
     "id": "e8856691-d15c-4d82-b0b0-b5e2c2b74ddf",
