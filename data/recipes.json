@@ -3,7 +3,9 @@
     "id": "e5796b90-5a56-4763-a4a5-e078ae31869a",
     "title": "Ash Reshteh",
     "image": "https://www.unicornsinthekitchen.com/wp-content/uploads/2019/03/Ash-Reshteh-SQ-480x270.jpg",
-    "category": [],
+    "category": [
+      "Persian"
+    ],
     "servings": "6 servings",
     "prepTime": "",
     "cookTime": "",
