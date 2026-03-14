@@ -110,9 +110,11 @@
   },
   {
     "id": "c4fc35d2-ef90-4fe6-835a-ed75969d70a7",
-    "title": "Adasi Persian Lentil Soup Recipe",
+    "title": "Adasi Lentil Soup",
     "image": "https://www.unicornsinthekitchen.com/wp-content/uploads/2019/10/Adasi-Persian-Lentil-Soup-Recipe-SQ-480x270.jpg",
-    "category": [],
+    "category": [
+      "Soup"
+    ],
     "servings": "6 servings",
     "prepTime": "10 mins",
     "cookTime": "30 mins",
