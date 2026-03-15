@@ -1,5 +1,40 @@
 [
   {
+    "id": "d4e6605c-cb13-463a-ab53-37b5af7f49ff",
+    "title": "Sourdough Ciabatta Rolls",
+    "image": "https://littlespoonfarm.com/wp-content/uploads/2021/05/sourdough-ciabatta-recipe-480x270.jpg",
+    "category": [
+      "Bread",
+      "Sourdough"
+    ],
+    "servings": "8",
+    "prepTime": "",
+    "cookTime": "",
+    "sourceUrl": "https://littlespoonfarm.com/sourdough-ciabatta-rolls-recipe/#recipe",
+    "notes": "",
+    "ingredients": [
+      "1 tablespoon sourdough starter",
+      "1/3 cup + 1 tablespoon all-purpose flour",
+      "3 1/2 tablespoons water",
+      "1/2 cup active sourdough starter",
+      "4 cups + 2 tablespoons bread flour",
+      "1 2/3 cups water",
+      "2 teaspoons salt"
+    ],
+    "instructions": [
+      "— Feed Your Sourdough Starter —",
+      "12 hours before you plan to mix the dough, add the ingredients to make ½ cup (100 g) of active sourdough starter to a clean jar. Stir until combined, loosely cover the jar and let the starter rise at room temperature. (The ingredients will create a total of 115 g active starter but, because some of it will stick to the sides of the jar during the transfer, we are making a little more than needed.) The sourdough starter is ready to use when it has doubled in size and there are plenty of bubbles on the surface and sides of the jar.",
+      "— Make the Dough —",
+      "Mix the dough. Combine the active sourdough starter, bread flour, water and salt in a large mixing bowl. Use a stiff spatula or your hands to incorporate the ingredients, making sure there are no dry bits left in the bowl. Cover the bowl and let the dough rest at room temperature for 1 hour.",
+      "Stretch and fold. Perform 3 sets of stretches and folds, 30 minutes apart. Keep the bowl covered in between each set.",
+      "First rise. Cover the dish and allow the dough to rise about 50% in volume,. This can take anywhere from 3-6 hours at room temperature. Warm kitchens will take less time, cold kitchens will need more time. See notes for rising times.",
+      "Second rise. Place the covered bowl of dough in the fridge for 8-36 hours for a long ferment OR proceed to the next step and shape the dough.",
+      "Shape. Remove the dough from the fridge and generously flour your work surface before turning the dough out onto it. Flour the top of the dough and use your hands to form it into a rectangular shape. Be careful not to press the air from the dough. Cut the dough into 8 pieces and place them on a parchment lined baking sheet. Cover with a clean towel and allow the dough to rise at room temperature for 2 hours or until puffy.",
+      "Bake. While the dough is resting, preheat your oven to 475°F (246°C). Bake the ciabatta dough for 10 minutes, turn the oven down to 425°F (218°C) and bake for an additional 20 minutes or until the crust is a deep golden brown. Allow the ciabatta bread to cool on a cooling rack for 30 minutes before slicing."
+    ],
+    "addedAt": "2026-03-15T23:38:30.768Z"
+  },
+  {
     "id": "557afd86-71ed-42de-b024-06bd62f2d038",
     "title": "Baker's Yeast Focaccia",
     "image": "https://alexandracooks.com/wp-content/uploads/2021/09/rosemaryfocacciawhole_alexandraskitchen.jpg",
