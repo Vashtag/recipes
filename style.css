@@ -1175,6 +1175,54 @@ body.cook-mode-open { overflow: hidden; }
 /* ── Header top actions ──────────────────────────── */
 .header-top-actions { display: flex; gap: 2px; align-items: center; }
 
+/* ── Header search row (search + category filter btn) ── */
+.header-search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.header-search-row .search-wrap { flex: 1; }
+.cat-filter-btn {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  padding: 6px 8px;
+}
+
+/* ── Category Browser View ───────────────────────── */
+.cat-pills-wrap {
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid var(--border);
+}
+#cat-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cat-pill {
+  padding: 8px 18px;
+  border-radius: 50px;
+  border: 1.5px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.cat-pill.active {
+  border-color: var(--orange);
+  background: rgba(232,101,42,0.12);
+  color: var(--orange);
+}
+.cat-pill:active { opacity: 0.75; }
+.cat-results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 14px;
+}
+
 /* ── Meal Planner View ───────────────────────────── */
 .planner-reset-btn {
   margin-left: auto;
