@@ -1,5 +1,42 @@
 [
   {
+    "id": "a55b9322-3953-45db-95c4-db9f0b37ed55",
+    "title": "Ground Beef and Potatoes Skillet",
+    "image": "https://www.wellplated.com/wp-content/uploads/2020/12/Gound-Beef-and-Potato-Casserole.jpg",
+    "category": [
+      "Dinner"
+    ],
+    "servings": "4 servings",
+    "prepTime": "15 mins",
+    "cookTime": "20 mins",
+    "sourceUrl": "https://www.wellplated.com/ground-beef-and-potatoes/",
+    "notes": "",
+    "ingredients": [
+      "2 tablespoons canola oil",
+      "1 pound potatoes (peeled and diced into ¼-inch cubes)",
+      "1 pound 93% lean ground beef",
+      "1 small yellow onion (diced)",
+      "1 red bell pepper (diced)",
+      "1 tablespoon Worcestershire sauce",
+      "1 teaspoon Dijon mustard",
+      "2 teaspoons smoked paprika",
+      "1 teaspoon garlic powder",
+      "1 teaspoon dried oregano",
+      "1 teaspoon kosher salt",
+      "¼ teaspoon ground black pepper",
+      "1 to 2 teaspoons hot sauce",
+      "2 green onions (sliced)"
+    ],
+    "instructions": [
+      "Heat the oil in a skillet large enough to hold all of the ingredients over high heat. Once the oil is hot and shiny, reduce the heat to medium, then add the potatoes. Cook, stirring often, until the potatoes are turning golden and becoming tender (they should still be too firm to eat), about 6 minutes.",
+      "Add the beef, onion, and bell pepper. Cook, breaking apart the meat.",
+      "Add the Worcestershire, mustard, smoked paprika, garlic powder, oregano, salt, pepper, and hot sauce (add 1 teaspoon if you prefer only subtle heat, more if you would like it spicier).",
+      "Continue cooking and breaking up the beef, until the potatoes and onions are tender and the meat is fully cooked through, about 6 to 8 minutes more.",
+      "Stir in the green onions. Taste and adjust the salt and pepper as desired. Serve hot, topped with Greek yogurt, cheese, over rice, or enjoy it all on its own with a dash of extra hot sauce if you like."
+    ],
+    "addedAt": "2026-03-15T23:53:31.357Z"
+  },
+  {
     "id": "2ef3baa0-4bdf-4cb4-b730-0f19cf1fa691",
     "title": "Smothered Pork Chops",
     "image": "https://cafedelites.com/wp-content/uploads/2020/06/Smothered-Pork-Chops-IMAGE-46-480x270.jpg",
