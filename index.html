@@ -23,12 +23,31 @@
           <button class="icon-btn settings-top-btn" onclick="showView('settings')" title="Settings">⚙️</button>
         </div>
       </div>
-      <div class="header-search search-wrap">
-        <input type="search" id="search-input" placeholder="Search recipes…" autocomplete="off" />
+      <div class="header-search-row">
+        <div class="search-wrap">
+          <input type="search" id="search-input" placeholder="Search recipes…" autocomplete="off" />
+        </div>
+        <button class="icon-btn cat-filter-btn" onclick="showView('categories')" title="Browse by category">🏷️</button>
       </div>
     </header>
 
     <!-- ==================== VIEWS ==================== -->
+
+    <!-- VIEW: Category Browser -->
+    <main id="view-categories" class="view hidden">
+      <div class="view-header">
+        <button class="back-btn" onclick="showView('list')">← Back</button>
+        <h2>Browse by Category</h2>
+      </div>
+      <div class="cat-pills-wrap">
+        <div id="cat-pills"></div>
+      </div>
+      <div id="cat-results" class="cat-results-grid"></div>
+      <div id="cat-empty" class="empty-state hidden">
+        <span class="empty-icon">🏷️</span>
+        <p>Select a category above<br>to see matching recipes.</p>
+      </div>
+    </main>
 
     <!-- VIEW: Recipe List -->
     <main id="view-list" class="view active">

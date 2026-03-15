@@ -284,7 +284,7 @@ function showView(name) {
   // Show/hide main header (visible on list and favourites)
   document.getElementById("main-header").style.display = (name === "list" || name === "favourites") ? "" : "none";
   // Search bar only useful on list view
-  document.querySelector(".header-search").style.display = name === "list" ? "" : "none";
+  document.querySelector(".header-search-row").style.display = name === "list" ? "" : "none";
 
   // Update nav active state
   document.querySelectorAll(".nav-btn[data-view]").forEach(btn => {
@@ -297,6 +297,7 @@ function showView(name) {
   if (name === "settings") initSettingsView();
   if (name === "fridge") initFridgeView();
   if (name === "planner") loadMealPlan().then(renderPlanner);
+  if (name === "categories") initCategoryView();
 }
 
 // ── Tabs (URL / Manual) ────────────────────────────
@@ -1054,5 +1055,53 @@ async function confirmResetPlan() {
     renderPlanner();
     try { await saveMealPlan(); }
     catch (e) { showToast("Could not save meal plan: " + e.message); }
+  }
+}
+
+// ── Category Browser ────────────────────────────────
+const CATEGORIES = ["Breakfast","Lunch","Dinner","Pasta","Soup","Salad","Cookie","Cake","Persian","Bread","Sourdough","Other"];
+
+let activeCategories = [];
+
+function initCategoryView() {
+  renderCategoryPills();
+  renderCategoryResults();
+}
+
+function renderCategoryPills() {
+  document.getElementById("cat-pills").innerHTML = CATEGORIES.map(cat => `
+    <button class="cat-pill${activeCategories.includes(cat) ? " active" : ""}" onclick="toggleCategory('${cat}')">${cat}</button>
+  `).join("");
+}
+
+function toggleCategory(cat) {
+  const idx = activeCategories.indexOf(cat);
+  if (idx === -1) activeCategories.push(cat);
+  else activeCategories.splice(idx, 1);
+  renderCategoryPills();
+  renderCategoryResults();
+}
+
+function renderCategoryResults() {
+  const grid = document.getElementById("cat-results");
+  const empty = document.getElementById("cat-empty");
+
+  if (activeCategories.length === 0) {
+    grid.innerHTML = "";
+    empty.classList.remove("hidden");
+    return;
+  }
+
+  const filtered = recipes.filter(r =>
+    activeCategories.some(cat => (r.category || []).includes(cat))
+  );
+
+  if (filtered.length === 0) {
+    grid.innerHTML = "";
+    empty.classList.remove("hidden");
+    empty.querySelector("p").innerHTML = "No recipes found<br>for the selected categories.";
+  } else {
+    empty.classList.add("hidden");
+    grid.innerHTML = filtered.map(recipeCardHtml).join("");
   }
 }
