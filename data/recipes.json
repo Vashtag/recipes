@@ -1,5 +1,39 @@
 [
   {
+    "id": "04033624-1899-4bb8-a0f5-3da927e03a94",
+    "title": "Lemon Butter Pasta",
+    "image": "https://photos.app.goo.gl/aQjz3PRHQQLekNS1A",
+    "category": [
+      "Dinner",
+      "Pasta"
+    ],
+    "servings": "5",
+    "prepTime": "10",
+    "cookTime": "20",
+    "sourceUrl": "https://www.thekitchn.com/lemon-butter-pasta-vegetables-260357",
+    "notes": "",
+    "ingredients": [
+      "1 pound dry short pasta, such as fusilli, cavatappi, or gemelli",
+      "2 tablespoons olive oil",
+      "1 pound zucchini or yellow squash (about 2 medium), halved lengthwise and thinly sliced crosswise",
+      "1 pint cherry or grape tomatoes (about 2 cups), halved",
+      "1/2 teaspoon kosher salt, plus more for the pasta water",
+      "1/4 teaspoon freshly ground black pepper",
+      "2 tablespoons unsalted butter",
+      "2 cloves garlic, finely chopped",
+      "1 1/2 teaspoons finely grated lemon zest",
+      "3 tablespoons freshly squeezed lemon juice (from 1 large lemon)",
+      "1/3 cup chopped fresh basil leaves",
+      "Grated Parmesan cheese, for serving (optional)"
+    ],
+    "instructions": [
+      "Bring a large pot of salted water to a boil over medium-high heat. Add the pasta and cook 1 minute less than al dente, about 8 minutes or according to package instructions. Meanwhile, cook the vegetables.",
+      "Heat the olive oil in a large skillet over medium heat until shimmering. Add the squash, tomatoes, salt, and pepper. Cook until softened and the tomatoes release some of their juices, 4 to 5 minutes. Add the butter, garlic, and lemon zest. Cook until the butter is melted and fragrant, about 1 minute. Remove from the heat and stir in the lemon juice.",
+      "Reserve 1/2 cup of the pasta cooking water, then drain the pasta. Return the skillet to medium heat. Add the pasta and reserved cooking water and toss until the sauce thickens and coats the pasta, 1 to 2 minutes. Taste and season with more salt and pepper as needed. Remove from the heat and stir in the basil. Garnish with Parmesan, if using."
+    ],
+    "addedAt": "2026-03-15T18:24:44.247Z"
+  },
+  {
     "id": "89c97978-dbaf-4800-b875-da33ac69edea",
     "title": "Oven Baked Ribs",
     "image": "https://www.inspiredtaste.net/wp-content/uploads/2016/06/Oven-Baked-Ribs-Recipe-2-1200.jpg",
