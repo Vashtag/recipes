@@ -7,6 +7,7 @@ let recipes = [];          // loaded from GitHub
 let currentRecipeId = null; // recipe open in detail view
 let editingId = null;       // non-null when editing an existing recipe
 let fileSha = null;         // current SHA of recipes.json (needed for GitHub API writes)
+let mealPlanSha = null;     // current SHA of mealplan.json (needed for GitHub API writes)
 
 // ── Init ───────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
@@ -295,7 +296,7 @@ function showView(name) {
   if (name === "favourites") renderFavouritesView();
   if (name === "settings") initSettingsView();
   if (name === "fridge") initFridgeView();
-  if (name === "planner") renderPlanner();
+  if (name === "planner") loadMealPlan().then(renderPlanner);
 }
 
 // ── Tabs (URL / Manual) ────────────────────────────
@@ -938,17 +939,44 @@ function showToast(msg) {
 // ── Meal Planner ───────────────────────────────────
 const DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const DAY_KEYS = ["sun","mon","tue","wed","thu","fri","sat"];
+const MEAL_PLAN_FILE = "data/mealplan.json";
 
-let mealPlan = loadMealPlan();
+let mealPlan = {};
 let pickerTargetDay = null;
 
-function loadMealPlan() {
-  try { return JSON.parse(localStorage.getItem("mealPlan")) || {}; }
-  catch { return {}; }
+async function loadMealPlan() {
+  try {
+    const url = `${GH_API}/repos/${CONFIG.githubOwner}/${CONFIG.githubRepo}/contents/${MEAL_PLAN_FILE}?ref=${getBranch()}`;
+    const res = await fetch(url, { headers: ghHeaders() });
+    if (res.status === 404) { mealPlan = {}; mealPlanSha = null; return; }
+    if (!res.ok) throw new Error(`GitHub API error ${res.status}`);
+    const data = await res.json();
+    mealPlanSha = data.sha;
+    mealPlan = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\n/g, "")))));
+  } catch (e) {
+    console.warn("Could not load meal plan:", e.message);
+    mealPlan = {};
+    mealPlanSha = null;
+  }
 }
 
-function saveMealPlan() {
-  localStorage.setItem("mealPlan", JSON.stringify(mealPlan));
+async function saveMealPlan() {
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(mealPlan, null, 2))));
+  const url = `${GH_API}/repos/${CONFIG.githubOwner}/${CONFIG.githubRepo}/contents/${MEAL_PLAN_FILE}`;
+  const body = { message: "Update meal plan", content, branch: getBranch() };
+  if (mealPlanSha) body.sha = mealPlanSha;
+  const res = await fetch(url, { method: "PUT", headers: ghHeaders(true), body: JSON.stringify(body) });
+  if (!res.ok) {
+    let msg = `GitHub API error ${res.status}`;
+    try {
+      const err = await res.json();
+      if (res.status === 409) msg = "Conflict: someone else saved at the same time. Please reload.";
+      else msg = err.message || msg;
+    } catch { /* not JSON */ }
+    throw new Error(msg);
+  }
+  const data = await res.json();
+  mealPlanSha = data.content.sha;
 }
 
 function renderPlanner() {
@@ -998,12 +1026,13 @@ function renderPickerList() {
   `).join("");
 }
 
-function assignRecipe(recipeId) {
+async function assignRecipe(recipeId) {
   if (!pickerTargetDay) return;
   mealPlan[pickerTargetDay] = recipeId;
-  saveMealPlan();
   closeRecipePicker();
   renderPlanner();
+  try { await saveMealPlan(); }
+  catch (e) { showToast("Could not save meal plan: " + e.message); }
 }
 
 function closeRecipePicker() {
@@ -1011,17 +1040,19 @@ function closeRecipePicker() {
   pickerTargetDay = null;
 }
 
-function removePlanDay(dayKey) {
+async function removePlanDay(dayKey) {
   delete mealPlan[dayKey];
-  saveMealPlan();
   renderPlanner();
+  try { await saveMealPlan(); }
+  catch (e) { showToast("Could not save meal plan: " + e.message); }
 }
 
-function confirmResetPlan() {
+async function confirmResetPlan() {
   if (Object.keys(mealPlan).length === 0) return;
   if (confirm("Clear the whole week?")) {
     mealPlan = {};
-    saveMealPlan();
     renderPlanner();
+    try { await saveMealPlan(); }
+    catch (e) { showToast("Could not save meal plan: " + e.message); }
   }
 }
