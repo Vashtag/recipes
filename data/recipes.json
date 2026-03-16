@@ -162,9 +162,9 @@
       "Dinner",
       "Pasta"
     ],
-    "servings": "5",
-    "prepTime": "10",
-    "cookTime": "20",
+    "servings": "5 servings",
+    "prepTime": "10 mins",
+    "cookTime": "20 mins",
     "sourceUrl": "https://www.thekitchn.com/lemon-butter-pasta-vegetables-260357",
     "notes": "",
     "ingredients": [
