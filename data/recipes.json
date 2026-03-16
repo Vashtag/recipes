@@ -162,9 +162,9 @@
       "Dinner",
       "Pasta"
     ],
-    "servings": "5",
-    "prepTime": "10",
-    "cookTime": "20",
+    "servings": "5 servings",
+    "prepTime": "10 mins",
+    "cookTime": "20 mins",
     "sourceUrl": "https://www.thekitchn.com/lemon-butter-pasta-vegetables-260357",
     "notes": "",
     "ingredients": [
@@ -195,9 +195,9 @@
     "category": [
       "Dinner"
     ],
-    "servings": "Makes 4 Servings",
-    "prepTime": "",
-    "cookTime": "",
+    "servings": "4 Servings",
+    "prepTime": "15 mins",
+    "cookTime": "3 hr",
     "sourceUrl": "https://www.inspiredtaste.net/7179/sweet-and-spicy-oven-baked-ribs/",
     "notes": "",
     "ingredients": [
@@ -311,14 +311,14 @@
   {
     "id": "e5796b90-5a56-4763-a4a5-e078ae31869a",
     "title": "Ash Reshteh",
-    "image": "https://saffronandherbs.com/wp-content/uploads/2022/01/Ash-Reshteh.jpg",
+    "image": "https://www.unicornsinthekitchen.com/wp-content/uploads/2019/03/Ash-Reshteh-SQ-480x270.jpg",
     "category": [
       "Soup",
       "Persian"
     ],
     "servings": "6 servings",
-    "prepTime": "1 hr 15 mins",
-    "cookTime": "1 hr 30 mins",
+    "prepTime": "",
+    "cookTime": "",
     "sourceUrl": "https://www.unicornsinthekitchen.com/ash-reshteh-persian-noodle-soup/",
     "notes": "",
     "ingredients": [
