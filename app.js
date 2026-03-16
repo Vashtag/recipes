@@ -1059,7 +1059,7 @@ async function confirmResetPlan() {
 }
 
 // ── Category Browser ────────────────────────────────
-const CATEGORIES = ["Breakfast","Lunch","Dinner","Pasta","Soup","Salad","Cookie","Cake","Persian","Bread","Sourdough","Other"];
+const CATEGORIES = ["Breakfast","Lunch","Dinner","Pasta","Soup","Salad","Cookie","Cake","Persian","Bread","Sourdough","Vegetarian","Other"];
 
 let activeCategories = [];
 
