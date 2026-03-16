@@ -162,9 +162,9 @@
       "Dinner",
       "Pasta"
     ],
-    "servings": "5 servings",
-    "prepTime": "10 mins",
-    "cookTime": "20 mins",
+    "servings": "5",
+    "prepTime": "10",
+    "cookTime": "20",
     "sourceUrl": "https://www.thekitchn.com/lemon-butter-pasta-vegetables-260357",
     "notes": "",
     "ingredients": [
@@ -195,9 +195,9 @@
     "category": [
       "Dinner"
     ],
-    "servings": "4 Servings",
-    "prepTime": "15 mins",
-    "cookTime": "3 hr",
+    "servings": "Makes 4 Servings",
+    "prepTime": "",
+    "cookTime": "",
     "sourceUrl": "https://www.inspiredtaste.net/7179/sweet-and-spicy-oven-baked-ribs/",
     "notes": "",
     "ingredients": [
@@ -281,9 +281,9 @@
     "category": [
       "Persian"
     ],
-    "servings": "4",
-    "prepTime": "",
-    "cookTime": "",
+    "servings": "4 servings",
+    "prepTime": "40 mins",
+    "cookTime": "50 mins",
     "sourceUrl": "https://www.unicornsinthekitchen.com/kabab-tabei-persian-pan-kebab/",
     "notes": "",
     "ingredients": [
@@ -296,7 +296,7 @@
     ],
     "instructions": [
       "Grate the onion and squeeze fully so the juice is all out. Discard the juice.",
-      "Put ground beef in a bowl, add grated onion and spiced to it. Mix and knead very well.*",
+      "Put ground beef in a bowl, add grated onion and spiced to it. Mix and knead very well.",
       "Coat the bottom of a pan using one tablespoon olive oil.",
       "Spread the beef mixture in the pan using a spatula or just your hands.",
       "Using a spatula, divide the mixture into strips.",
@@ -311,14 +311,14 @@
   {
     "id": "e5796b90-5a56-4763-a4a5-e078ae31869a",
     "title": "Ash Reshteh",
-    "image": "https://www.unicornsinthekitchen.com/wp-content/uploads/2019/03/Ash-Reshteh-SQ-480x270.jpg",
+    "image": "https://saffronandherbs.com/wp-content/uploads/2022/01/Ash-Reshteh.jpg",
     "category": [
       "Soup",
       "Persian"
     ],
     "servings": "6 servings",
-    "prepTime": "",
-    "cookTime": "",
+    "prepTime": "1 hr 15 mins",
+    "cookTime": "1 hr 30 mins",
     "sourceUrl": "https://www.unicornsinthekitchen.com/ash-reshteh-persian-noodle-soup/",
     "notes": "",
     "ingredients": [
