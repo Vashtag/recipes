@@ -1,5 +1,35 @@
 [
   {
+    "id": "bd0976dd-55ef-4a6b-872d-c3f63cf69cb6",
+    "title": "Coleslaw",
+    "image": "https://www.recipetineats.com/tachyon/2018/06/Coleslaw_7a.jpg?resize=480%2C270",
+    "category": [
+      "Salad"
+    ],
+    "servings": "6 - 8 people",
+    "prepTime": "",
+    "cookTime": "",
+    "sourceUrl": "https://www.recipetineats.com/coleslaw/#recipe",
+    "notes": "",
+    "ingredients": [
+      "7 cups green cabbage (, finely shredded (Note 1))",
+      "1 medium carrot (, shredded (1 1/2 cups))",
+      "1/2 cup Hellman's mayonnaise ((or other whole egg mayo))",
+      "1/2 cup sour cream or yoghurt, (full fat is best)",
+      "1 1/2 tbsp apple cider vinegar ((or sub with white wine vinegar))",
+      "2 tsp Dijon mustard",
+      "2 tbsp white sugar",
+      "3/4 tsp celery salt",
+      "1/4 tso black pepper"
+    ],
+    "instructions": [
+      "Mix Dressing ingredients together.",
+      "Place cabbage and carrot in a bowl. Pour over Dressing, toss well. Set aside for at least 20 minutes before serving, preferably 2 hours - this will make the cabbage go limp as it should, and also draw moisture out of the cabbage and carrot to thin out the dressing. Overnight is even better!",
+      "Toss well before serving."
+    ],
+    "addedAt": "2026-03-23T01:36:19.744Z"
+  },
+  {
     "id": "a55b9322-3953-45db-95c4-db9f0b37ed55",
     "title": "Ground Beef and Potatoes Skillet",
     "image": "https://www.wellplated.com/wp-content/uploads/2020/12/Gound-Beef-and-Potato-Casserole.jpg",
