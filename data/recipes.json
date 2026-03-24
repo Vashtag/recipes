@@ -1,5 +1,41 @@
 [
   {
+    "id": "f420d747-dd61-4abd-8f9c-28f0bf3e7642",
+    "title": "Persian Meat Patties- Kotlet",
+    "image": "https://www.unicornsinthekitchen.com/wp-content/uploads/2022/03/kotlet-SQ-480x270.jpg",
+    "category": [
+      "Persian"
+    ],
+    "servings": "4 servings",
+    "prepTime": "",
+    "cookTime": "",
+    "sourceUrl": "https://www.unicornsinthekitchen.com/persian-meat-patties-kotlet/",
+    "notes": "",
+    "ingredients": [
+      "1 pound ground beef",
+      "2 russet potato",
+      "1 onion",
+      "1 egg",
+      "3 tbsp. flour",
+      "1/2 tsp turmeric",
+      "1/2 tsp black pepper",
+      "1 tsp salt",
+      "4 tbsp vegetable oil",
+      "1 tomatoes (sliced)",
+      "1 cup pickles (sliced)",
+      "fries"
+    ],
+    "instructions": [
+      "Grate the onion. Squeeze it very hard and dispose all the juice. (The juice will make the patties fall apart). Peel and grate the potato as well.",
+      "Mix the grated onion with ground beef.",
+      "Add the egg, flour and spices, using your hand, mix everything until well combined. The mixture is going to be very sticky.",
+      "Heat the oil in a shallow pan over medium heat.",
+      "Place a bowl of water near yourself, wet your hands, take about 2 tablespoons of the patty mixture, form into oval and fry it in the oil, about 5 minutes on each side until brown and cooked inside.",
+      "Serve warm with tomatoes, fries and pickled cucumber."
+    ],
+    "addedAt": "2026-03-24T02:40:05.858Z"
+  },
+  {
     "id": "5973750a-ce61-4ef8-927e-a1431f11234b",
     "title": "Sourdough Bagels",
     "image": "https://littlespoonfarm.com/wp-content/uploads/2020/04/Sourdough-Bagel-Recipe-480x270.jpg",
