@@ -1,5 +1,46 @@
 [
   {
+    "id": "5973750a-ce61-4ef8-927e-a1431f11234b",
+    "title": "Sourdough Bagels",
+    "image": "https://littlespoonfarm.com/wp-content/uploads/2020/04/Sourdough-Bagel-Recipe-480x270.jpg",
+    "category": [
+      "Sourdough"
+    ],
+    "servings": "8",
+    "prepTime": "",
+    "cookTime": "",
+    "sourceUrl": "https://littlespoonfarm.com/sourdough-bagels-recipe/#recipe",
+    "notes": "",
+    "ingredients": [
+      "1 tablespoon sourdough starter",
+      "1/3 cup + 1 tablespoon all-purpose flour",
+      "3 1/2 tablespoons water",
+      "1/2 cup active sourdough starter",
+      "1 cup + 1 tablespoon water",
+      "2 tablespoons honey (or sugar)",
+      "2 teaspoons fine sea salt",
+      "4 cups + 2 tablespoons bread flour",
+      "6 cups water",
+      "1 tablespoon granulated sugar",
+      "sesame seeds",
+      "Everything Bagel Seasoning",
+      "salt ( sprinkle on top, don&#039;t dip)",
+      "poppy seeds",
+      "shredded cheese"
+    ],
+    "instructions": [
+      "— Feed Your Sourdough Starter —",
+      "12 hours before you plan to mix the dough, add the ingredients to make ½ cup (100 g) of active sourdough starter to a clean jar. Stir until combined, loosely cover the jar and let the starter rise at room temperature. (The ingredients will create a total of 115 g active starter but, because some of it will stick to the sides of the jar during the transfer, we are making a little more than needed.) The sourdough starter is ready to use when it has doubled in size and there are plenty of bubbles on the surface and sides of the jar.",
+      "— Make the Dough —",
+      "In the bowl of a stand mixer, stir together the starter, water, honey and salt with a spatula. Add the bread flour and use your hands to bring the ingredients together as best as possible. The dough will be very stiff. Place the dough hook on the mixer and mix the dough on the lowest speed for 6-7 minutes. (Or 10 minutes by hand.) Cover the bowl and let rest at room temperature for 8-12 hours. (See notes for cinnamon raisin bagels.)",
+      "Line a baking sheet with parchment paper. Turn the dough out onto a clean work surface and divide into 8 equal pieces. Shape each piece into a ball. To shape the bagel, place a dough ball on the surface in front of you and use your thumb to poke a hole straight down through the middle of the dough. Pick the bagel dough up, gently shape the ring and place on the parchment paper. Repeat with remaining dough balls. Cover the dough with a towel and let rise for 30-60 minutes or until puffy. (See notes about parchment paper.)",
+      "Preheat oven to 425°F (218°C) making sure that the oven rack in the center position. Bring 6 cups of water to a boil in a large stockpot and add 1 tablespoon of sugar. Once the bagels have finished rising, boil them for 2 minutes on each side. (Only boil 3-4 at a time, making sure not to crowd the pot.)",
+      "Use a mesh stainer to remove the bagels and let rest on the parchment paper until cool enough to handle. Once cool enough, dip one side into your choice of toppings and place back onto the parchment paper.",
+      "Bake the bagels at 425°F (218°C) for 25-28 minutes or until golden brown."
+    ],
+    "addedAt": "2026-03-24T02:38:23.021Z"
+  },
+  {
     "id": "bd0976dd-55ef-4a6b-872d-c3f63cf69cb6",
     "title": "Coleslaw",
     "image": "https://www.recipetineats.com/tachyon/2018/06/Coleslaw_7a.jpg?resize=480%2C270",
