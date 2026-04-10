@@ -49,7 +49,9 @@
     "id": "b9da4437-e9a7-404c-bf2f-396740ce598e",
     "title": "Kashke Bademjan",
     "image": "https://www.unicornsinthekitchen.com/wp-content/uploads/2019/08/Kashke-Bademjan-Persian-Eggplant-Dip-sq-480x270.jpg",
-    "category": [],
+    "category": [
+      "Persian"
+    ],
     "servings": "4 servings",
     "prepTime": "",
     "cookTime": "",
