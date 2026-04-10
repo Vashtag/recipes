@@ -1,5 +1,51 @@
 [
   {
+    "id": "6e3bf76b-fafc-484d-bf4e-7cf4a2fb4be0",
+    "title": "Nicole's Enchiladas",
+    "image": "",
+    "category": [
+      "Dinner"
+    ],
+    "servings": "4",
+    "prepTime": "1 hr",
+    "cookTime": "25 mins",
+    "sourceUrl": "",
+    "notes": "",
+    "ingredients": [
+      "-- red sauce --",
+      "3 tbsp olive oil",
+      "3 tbsp flour",
+      "1 tbsp chili powder",
+      "1 tsp cumin",
+      "1/2 tsp garlic powder",
+      "1/4 tsp oregano",
+      "salt",
+      "black pepper",
+      "2 tbsp tomato paste",
+      "2 cups broth",
+      "1 tsp white vinegar",
+      "-- filling --",
+      "red sauce",
+      "rice",
+      "chicken/beef",
+      "black beans",
+      "corn",
+      "onion",
+      "bell pepper"
+    ],
+    "instructions": [
+      "Heat oil in pot until hot (flour should sizzle on contact).",
+      "Whisk in flour and spices until fragrant.",
+      "Whisk in tomato paste.",
+      "Add broth. Simmer and whisk sauce until it has thickened a bit.",
+      "Remove from heat and whisk in vinegar .",
+      "Assembly: add sauce to bottom of pan, roll as much filling as you can into the tortilla, pour sauce over all enchiladas, top with cheese.",
+      "Cook at 350°C for 20 mins. Broil to brown the cheese.",
+      "Serve with fresh lettuce and tomato and sour cream."
+    ],
+    "addedAt": "2026-04-10T01:01:02.441Z"
+  },
+  {
     "id": "b9da4437-e9a7-404c-bf2f-396740ce598e",
     "title": "Kashke Bademjan",
     "image": "https://www.unicornsinthekitchen.com/wp-content/uploads/2019/08/Kashke-Bademjan-Persian-Eggplant-Dip-sq-480x270.jpg",
