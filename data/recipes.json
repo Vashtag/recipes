@@ -1,5 +1,43 @@
 [
   {
+    "id": "871b998c-82c4-41a3-906d-3cb91c49a1a6",
+    "title": "Pork Chow Mein",
+    "image": "https://www.womanscribbles.net/wp-content/uploads/2023/09/pork-chow-mein-2-480x270.jpg",
+    "category": [
+      "Dinner"
+    ],
+    "servings": "6",
+    "prepTime": "20 mins",
+    "cookTime": "20 mins",
+    "sourceUrl": "https://www.womanscribbles.net/garlic-pork-chow-mein/",
+    "notes": "",
+    "ingredients": [
+      "5 tbsp. soy sauce",
+      "3 tbsp. oyster sauce",
+      "3 tbsp. honey",
+      "½ tbsp. sesame oil",
+      "1 lb fresh chow mein noodles, cooked according to package directions (see notes for details and substitutions)",
+      "3 cloves garlic (minced)",
+      "1 lb ground pork",
+      "2 cups bok choy (chopped and washed)",
+      "2 medium carrots (cut into thin strips)",
+      "1 heaping cup broccoli",
+      "½ cup chicken broth",
+      "2 tbsp cooking oil",
+      "salt and pepper to taste"
+    ],
+    "instructions": [
+      "— Make the Sauce —",
+      "In a small bowl, combine al the sauce ingredients.",
+      "— Stir Fry the Noodles and Veggies —",
+      "Heat oil in large wok or pan. Add the garlic and cook until softened and aromatic. Add the pork and cook, breaking apart clumps, until browned and cooked through.",
+      "Add carrots, bok choy, broccoli and ¼ cup chicken broth. Toss everything well and allow to cook for about 5 minutes, until the bok choy starts to become limp.",
+      "Add the noodles and the remaining chicken broth. Toss using tongs until the noodles and vegetables are mixed together.",
+      "Pour the sauce all over the dish and toss to distribute. Season with salt and pepper and turn off heat. Serve immediately."
+    ],
+    "addedAt": "2026-05-10T21:35:00.860Z"
+  },
+  {
     "id": "3a02f973-10a0-4a98-83df-2706f3eb7dc4",
     "title": "Olive Oil Quince Cake",
     "image": "https://cardamomandtea.com/wp-content/uploads/2021/04/IMG_6670.jpg",
