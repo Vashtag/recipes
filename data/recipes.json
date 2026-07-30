@@ -1,5 +1,42 @@
 [
   {
+    "id": "9520cdf9-41f1-4461-acb9-b917a4aae9ac",
+    "title": "Fasolakia (Greek Bean Stew)",
+    "image": "https://www.foodbymaria.com/wp-content/uploads/2023/10/Fasolakia-_-5-480x270.jpg",
+    "category": [
+      "Dinner"
+    ],
+    "servings": "4",
+    "prepTime": "",
+    "cookTime": "",
+    "sourceUrl": "https://www.foodbymaria.com/fasolakia/",
+    "notes": "Add ground meat to make it heartier",
+    "ingredients": [
+      "1/4 cup olive oil",
+      "1 yellow onion (chopped)",
+      "3 potatoes (quartered, than halved)",
+      "2 1/2 tsp salt",
+      "1/2 tsp pepper",
+      "4 cups green beans",
+      "3 large tomatoes / 1 can diced tomatoes",
+      "2 tsp brown sugar / maple syrup",
+      "2 tbsp tomato paste",
+      "2 cups zucchini (cut into semi-circles)",
+      "1/2 cup fresh mint (chopped)",
+      "1 1/2-2 cups water",
+      "vegan or regular feta, olive oil, salt and bread for serving"
+    ],
+    "instructions": [
+      "In a large pot heat olive oil over medium heat and add the onions. Cook, stirring occasionally until the onions are translucent. Add the potatoes and salt and pepper and cook until the potatoes begin to develop some golden brown colour, about 5-8 minutes.",
+      "Add the green beans and cook for about 5 minutes.",
+      "Add in the tomatoes, sugar, tomato paste, zucchini and mint. Stir to combine.",
+      "Add the 1 1/2 cups water and bring to a simmer. Once simmering, reduce the heat to low, keeping at a simmer with the lid on the pot for 45-50 minutes, stirring occasionally.",
+      "Check once and a while to make sure there is always water in the pot. You don’t want this to be a soup-like dish but you definitely want some extra liquid so you can enjoy that beautiful sauce with a slice of bread. If needed, add 1/2 cup more water.",
+      "After 45-50 minutes, serve in bowls topped with feta and a drizzle of olive oil and a slice of bread to dip in."
+    ],
+    "addedAt": "2026-07-30T00:45:35.157Z"
+  },
+  {
     "id": "5c335fc4-3525-47c5-96e7-4b82bd17d441",
     "title": "Apricot & Pistachio Buns",
     "image": "https://www.baking-sense.com/wp-content/uploads/2016/06/apricot-pistachio-buns-13a-480x270.jpg",
