@@ -1,3 +1,108 @@
 {
-  "items": []
+  "items": [
+    {
+      "id": "d1b4a450-b631-44eb-adda-094037df8ffa",
+      "qty": 0.25,
+      "unitKey": "cup",
+      "name": "olive oil",
+      "text": "1/4 cup olive oil",
+      "checked": false
+    },
+    {
+      "id": "9fc54a96-b9ca-40c6-9f7a-1cdc8a645cef",
+      "qty": 1,
+      "unitKey": null,
+      "name": "yellow onion (chopped)",
+      "text": "1 yellow onion (chopped)",
+      "checked": false
+    },
+    {
+      "id": "51109f61-b9b5-4b5d-9d34-29ed7f5a0fe9",
+      "qty": 3,
+      "unitKey": null,
+      "name": "potatoes (quartered, than halved)",
+      "text": "3 potatoes (quartered, than halved)",
+      "checked": false
+    },
+    {
+      "id": "0fa859f4-250a-4d04-8671-1737261125d1",
+      "qty": 2.5,
+      "unitKey": "tsp",
+      "name": "salt",
+      "text": "2 1/2 tsp salt",
+      "checked": false
+    },
+    {
+      "id": "4ad50dca-9db4-4661-9b4f-2ce6d1f3ed8f",
+      "qty": 0.5,
+      "unitKey": "tsp",
+      "name": "pepper",
+      "text": "1/2 tsp pepper",
+      "checked": false
+    },
+    {
+      "id": "03a395b7-f8d9-4276-bec2-3471dc163d09",
+      "qty": 4,
+      "unitKey": "cup",
+      "name": "green beans",
+      "text": "4 cups green beans",
+      "checked": false
+    },
+    {
+      "id": "f6601f70-cd0e-4095-9755-ee1a0224532b",
+      "qty": 3,
+      "unitKey": null,
+      "name": "large tomatoes / 1 can diced tomatoes",
+      "text": "3 large tomatoes / 1 can diced tomatoes",
+      "checked": false
+    },
+    {
+      "id": "42d4079e-9bde-4f8e-91fd-9514d62d386e",
+      "qty": 2,
+      "unitKey": "tsp",
+      "name": "brown sugar / maple syrup",
+      "text": "2 tsp brown sugar / maple syrup",
+      "checked": false
+    },
+    {
+      "id": "e3e4ebbf-fd8f-4e8c-bce5-6d7cd73500eb",
+      "qty": 2,
+      "unitKey": "tbsp",
+      "name": "tomato paste",
+      "text": "2 tbsp tomato paste",
+      "checked": false
+    },
+    {
+      "id": "ef1944ac-6ddf-4876-a00e-2bb5563c8e67",
+      "qty": 2,
+      "unitKey": "cup",
+      "name": "zucchini (cut into semi-circles)",
+      "text": "2 cups zucchini (cut into semi-circles)",
+      "checked": false
+    },
+    {
+      "id": "823dad73-e384-4e8a-894d-fd63ef96c217",
+      "qty": 0.5,
+      "unitKey": "cup",
+      "name": "fresh mint (chopped)",
+      "text": "1/2 cup fresh mint (chopped)",
+      "checked": false
+    },
+    {
+      "id": "542bd3d5-4844-4bb5-8866-cec43f1d972f",
+      "qty": 2,
+      "unitKey": "cup",
+      "name": "water",
+      "text": "1 1/2-2 cups water",
+      "checked": false
+    },
+    {
+      "id": "a2ce1536-9f0e-4971-9aff-8aa63c5d891e",
+      "qty": null,
+      "unitKey": null,
+      "name": "vegan or regular feta, olive oil, salt and bread for serving",
+      "text": "vegan or regular feta, olive oil, salt and bread for serving",
+      "checked": false
+    }
+  ]
 }
