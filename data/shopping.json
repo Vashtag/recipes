@@ -1,22 +1,6 @@
 {
   "items": [
     {
-      "id": "0edcea69-ed7e-4cc9-9cc9-8cf2b6aeb70d",
-      "qty": 2.5,
-      "unitKey": "tsp",
-      "name": "salt",
-      "text": "2 1/2 tsp salt",
-      "checked": false
-    },
-    {
-      "id": "32025a25-3f81-4be3-b64f-28a31501ba54",
-      "qty": 0.5,
-      "unitKey": "tsp",
-      "name": "pepper",
-      "text": "1/2 tsp pepper",
-      "checked": false
-    },
-    {
       "id": "2cd34af3-a240-4446-a926-f28881a7de46",
       "qty": 4,
       "unitKey": "cup",
