@@ -1,14 +1,6 @@
 {
   "items": [
     {
-      "id": "cd30cc77-17bc-4fa3-936f-515468a7e3eb",
-      "qty": 0.25,
-      "unitKey": "cup",
-      "name": "olive oil",
-      "text": "1/4 cup olive oil",
-      "checked": false
-    },
-    {
       "id": "97c5f224-77ca-449c-955c-5130e7d939af",
       "qty": 1,
       "unitKey": null,
