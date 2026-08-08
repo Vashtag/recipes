@@ -1041,7 +1041,7 @@ function openRecipe(id) {
       <p>${escHtml(recipe.notes).replace(/\n/g, "<br>")}</p>
     </div>` : ""}
 
-    <div class="detail-section">
+    <div class="detail-section detail-section--ingredients">
       <h3>Ingredients</h3>
       ${scaleBarHtml()}
       <div id="ingredients-checklist">
@@ -1049,7 +1049,7 @@ function openRecipe(id) {
       </div>
     </div>
 
-    <div class="detail-section">
+    <div class="detail-section detail-section--instructions">
       <h3>Instructions</h3>
       <div id="detail-instructions">
         ${detailInstructionsHtml(recipe)}
@@ -1245,7 +1245,10 @@ function renderPlanner() {
         <div class="planner-day-label">${DAYS[i]}</div>
         ${recipe ? `
           <div class="planner-recipe-card" onclick="openRecipe('${recipe.id}')">
-            ${recipe.image ? `<img class="planner-thumb" src="${escHtml(recipe.image)}" alt="" onerror="this.style.display='none'">` : `<div class="planner-thumb-placeholder">🍽️</div>`}
+            ${recipe.image
+              ? `<img class="planner-thumb" src="${escHtml(recipe.image)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                 <div class="planner-thumb-placeholder" style="display:none">🍽️</div>`
+              : `<div class="planner-thumb-placeholder">🍽️</div>`}
             <span class="planner-recipe-title">${escHtml(recipe.title)}</span>
             <button class="planner-remove-btn" onclick="event.stopPropagation();removePlanDay('${key}')" title="Remove">✕</button>
           </div>
