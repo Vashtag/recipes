@@ -1,14 +1,6 @@
 {
   "items": [
     {
-      "id": "97f0184c-7a2c-4155-9d17-ba8f6180d395",
-      "qty": 2,
-      "unitKey": "tsp",
-      "name": "brown sugar / maple syrup",
-      "text": "2 tsp brown sugar / maple syrup",
-      "checked": false
-    },
-    {
       "id": "a321e3a8-a6b8-4e8b-95a7-3a772e24a397",
       "qty": 2,
       "unitKey": "tbsp",
