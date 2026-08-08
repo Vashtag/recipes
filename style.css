@@ -1558,15 +1558,6 @@ body.cook-mode-open { overflow: hidden; }
   flex-direction: column;
   gap: 14px;
 }
-.shopping-actions {
-  display: flex;
-  gap: 10px;
-}
-.shopping-action-btn {
-  flex: 1;
-  padding: 11px 12px;
-  font-size: 0.9rem;
-}
 .shopping-add-row {
   display: flex;
   gap: 8px;

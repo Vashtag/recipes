@@ -207,10 +207,6 @@
         <button class="planner-reset-btn" id="shop-clear-checked-btn" onclick="clearCheckedShop()" title="Remove ticked items">Clear ticked</button>
       </div>
       <div class="shopping-body">
-        <div class="shopping-actions">
-          <button class="btn-secondary shopping-action-btn" onclick="openShoppingPicker()">＋ From a recipe</button>
-          <button class="btn-secondary shopping-action-btn" onclick="addMealPlanToShop()">📅 From meal plan</button>
-        </div>
         <form class="shopping-add-row" onsubmit="addManualShopItem();return false;">
           <input type="text" id="shop-manual-input" placeholder="Add an item…" autocomplete="off" />
           <button type="submit" class="shopping-add-btn" title="Add item">＋</button>
@@ -218,7 +214,7 @@
         <div id="shopping-list"></div>
         <div id="shopping-empty" class="empty-state hidden">
           <span class="empty-icon">🛒</span>
-          <p>Your list is empty.<br>Add items or pull them from a recipe.</p>
+          <p>Your list is empty.<br>Add items above.</p>
         </div>
         <button class="shopping-clear-all-btn hidden" id="shop-clear-all-btn" onclick="confirmClearAllShop()">Clear entire list</button>
       </div>
