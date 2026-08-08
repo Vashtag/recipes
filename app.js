@@ -737,11 +737,173 @@ function resetAddForm() {
   document.getElementById("tab-manual").classList.add("hidden");
 }
 
+// ── Recipe Scaling ─────────────────────────────────
+const SCALE_OPTIONS = [0.5, 1, 1.5, 2, 3];
+let currentScale = 1;
+
+const UNICODE_FRACTIONS = {
+  "¼": 1/4, "½": 1/2, "¾": 3/4, "⅐": 1/7, "⅑": 1/9, "⅒": 1/10,
+  "⅓": 1/3, "⅔": 2/3, "⅕": 1/5, "⅖": 2/5, "⅗": 3/5, "⅘": 4/5,
+  "⅙": 1/6, "⅚": 5/6, "⅛": 1/8, "⅜": 3/8, "⅝": 5/8, "⅞": 7/8,
+};
+const UNI_CHARS = Object.keys(UNICODE_FRACTIONS).join("");
+
+// A single quantity: "1 1/2", "2½", "3/4", "½", "0.25", "2"
+const QTY_SRC = `(?:\\d+\\s+\\d+\\s*\\/\\s*\\d+|\\d+\\s*[${UNI_CHARS}]|\\d+\\s*\\/\\s*\\d+|[${UNI_CHARS}]|\\d+(?:\\.\\d+)?)`;
+// A quantity or a range of them: "1 1/2-2", "2 to 3"
+const RANGE_SRC = `${QTY_SRC}(?:\\s*(?:-|–|—|to)\\s*${QTY_SRC})?`;
+const RANGE_PARTS_RE = new RegExp(`^(${QTY_SRC})(?:\\s*(-|–|—|to)\\s*(${QTY_SRC}))?$`, "i");
+// Only scale a number that starts the line, opens a parenthetical, or follows an
+// alternative separator — so "2 cups" and "(¼ cup)" scale but "9x13 pan" and
+// "2% milk" do not.
+const QTY_PREFIX_RE = /(?:^|[\/+(]\s*|\b(?:or|and|plus)\s+)$/i;
+const QTY_SUFFIX_SKIP_RE = /^\s*(?:%|°|x\s*\d)/i;
+// "1 (14 oz) can beans" — a parenthetical right before a container word is a
+// package size, not an amount, so it stays as-is.
+const PACKAGE_SIZE_RE = /^[^()]*\)\s*(?:can|jar|tin|box|bag|pkg|package|bottle|container|block|stick|carton|loaf|log)s?\b/i;
+
+function parseQty(str) {
+  const s = String(str).trim();
+  let m;
+  if ((m = s.match(new RegExp(`^(\\d+)\\s*([${UNI_CHARS}])$`)))) return +m[1] + UNICODE_FRACTIONS[m[2]];
+  if (UNICODE_FRACTIONS[s] !== undefined) return UNICODE_FRACTIONS[s];
+  if ((m = s.match(/^(\d+)\s+(\d+)\s*\/\s*(\d+)$/))) return +m[1] + (+m[2]) / (+m[3]);
+  if ((m = s.match(/^(\d+)\s*\/\s*(\d+)$/))) return (+m[1]) / (+m[2]);
+  const v = parseFloat(s);
+  return isNaN(v) ? null : v;
+}
+
+// Render a number the way a recipe would: whole numbers, mixed fractions, or
+// a short decimal when no tidy fraction is close enough.
+function formatQty(value) {
+  if (!isFinite(value) || value < 0) return "";
+  const whole = Math.floor(value + 1e-9);
+  const frac = value - whole;
+  if (frac < 0.02) return String(whole);
+
+  for (const d of [2, 3, 4, 6, 8, 12, 16]) {
+    const n = Math.round(frac * d);
+    if (n > 0 && Math.abs(frac - n / d) < 0.02) {
+      if (n === d) return String(whole + 1);
+      const g = gcd(n, d);
+      const num = n / g, den = d / g;
+      return whole ? `${whole} ${num}/${den}` : `${num}/${den}`;
+    }
+  }
+  return String(Math.round(value * 100) / 100);
+}
+
+function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+
+// Multiply every quantity in a free-form line ("1 1/2 cups flour") by factor.
+// When asHtml is true the result is escaped and scaled numbers are highlighted.
+function scaleText(text, factor, asHtml) {
+  const src = String(text || "");
+  const esc = s => asHtml ? escHtml(s) : s;
+  if (!factor || factor === 1) return esc(src);
+
+  const re = new RegExp(RANGE_SRC, "gi");
+  let out = "", last = 0, m;
+  while ((m = re.exec(src)) !== null) {
+    if (m[0] === "") { re.lastIndex++; continue; }
+    const before = src.slice(0, m.index);
+    const after = src.slice(m.index + m[0].length);
+    if (!QTY_PREFIX_RE.test(before) || QTY_SUFFIX_SKIP_RE.test(after)) continue;
+    if (PACKAGE_SIZE_RE.test(after)) continue;
+
+    const parts = m[0].match(RANGE_PARTS_RE);
+    if (!parts) continue;
+    const lo = parseQty(parts[1]);
+    if (lo === null) continue;
+    let scaled = formatQty(lo * factor);
+    if (parts[3]) {
+      const hi = parseQty(parts[3]);
+      if (hi === null) continue;
+      scaled += `${parts[2] === "to" ? " to " : parts[2]}${formatQty(hi * factor)}`;
+    }
+    if (!scaled) continue;
+
+    out += esc(src.slice(last, m.index));
+    out += asHtml ? `<span class="qty-scaled">${escHtml(scaled)}</span>` : scaled;
+    last = m.index + m[0].length;
+  }
+  return out + esc(src.slice(last));
+}
+
+function scaleLabel(f) {
+  return (f === 0.5 ? "½" : String(f)) + "×";
+}
+
+function scaleBarHtml() {
+  return `
+    <div class="scale-bar">
+      <span class="scale-bar-label">Scale</span>
+      ${SCALE_OPTIONS.map(f => `
+        <button type="button" class="scale-btn${f === currentScale ? " active" : ""}" data-scale="${f}" onclick="setScale(${f})">${scaleLabel(f)}</button>
+      `).join("")}
+    </div>`;
+}
+
+function setScale(factor) {
+  currentScale = factor;
+  applyScale();
+}
+
+function detailIngredientsHtml(recipe) {
+  return recipe.ingredients.map((ing, i) => `
+    <div class="ingredient-item" onclick="toggleIngredient(this)" data-index="${i}">
+      <div class="ingredient-cb"></div>
+      <span class="ingredient-text">${scaleText(ing, currentScale, true)}</span>
+    </div>
+  `).join("");
+}
+
+function cookIngredientsHtml(recipe) {
+  return recipe.ingredients.map((ing, i) => `
+    <div class="cook-ingredient" onclick="this.classList.toggle('checked')" data-index="${i}">
+      <div class="ingredient-cb"></div>
+      <span>${scaleText(ing, currentScale, true)}</span>
+    </div>
+  `).join("");
+}
+
+// Re-render everything that depends on the scale, preserving ticked-off items.
+function applyScale() {
+  const recipe = recipes.find(r => r.id === currentRecipeId);
+  if (!recipe) return;
+
+  document.querySelectorAll(".scale-btn").forEach(btn => {
+    btn.classList.toggle("active", parseFloat(btn.dataset.scale) === currentScale);
+  });
+
+  const chip = document.getElementById("detail-servings-chip");
+  if (chip && recipe.servings) {
+    chip.innerHTML = `🍽 ${scaleText(recipe.servings, currentScale, true)}`;
+  }
+
+  const list = document.getElementById("ingredients-checklist");
+  if (list) rerenderChecklist(list, detailIngredientsHtml(recipe), ".ingredient-item");
+
+  const cookList = document.getElementById("cook-ingredients");
+  if (cookList) rerenderChecklist(cookList, cookIngredientsHtml(recipe), ".cook-ingredient");
+}
+
+function rerenderChecklist(container, html, itemSelector) {
+  const checked = new Set(
+    [...container.querySelectorAll(`${itemSelector}.checked`)].map(el => el.dataset.index)
+  );
+  container.innerHTML = html;
+  container.querySelectorAll(itemSelector).forEach(el => {
+    if (checked.has(el.dataset.index)) el.classList.add("checked");
+  });
+}
+
 // ── Recipe Detail ──────────────────────────────────
 function openRecipe(id) {
   const recipe = recipes.find(r => r.id === id);
   if (!recipe) return;
   currentRecipeId = id;
+  currentScale = 1;
 
   document.getElementById("detail-title").textContent = recipe.title;
   const favBtn = document.getElementById("fav-btn");
@@ -757,7 +919,7 @@ function openRecipe(id) {
 
     <div class="detail-meta">
       ${[].concat(recipe.category||[]).map(c => `<span class="meta-chip meta-chip--category">${escHtml(c)}</span>`).join("")}
-      ${recipe.servings ? `<span class="meta-chip">🍽 ${escHtml(recipe.servings)}</span>` : ""}
+      ${recipe.servings ? `<span class="meta-chip" id="detail-servings-chip">🍽 ${escHtml(recipe.servings)}</span>` : ""}
       ${recipe.prepTime ? `<span class="meta-chip">⏱ Prep: ${escHtml(recipe.prepTime)}</span>` : ""}
       ${recipe.cookTime ? `<span class="meta-chip">🔥 Cook: ${escHtml(recipe.cookTime)}</span>` : ""}
       ${recipe.addedAt ? `<span class="meta-chip">📅 ${formatDate(recipe.addedAt)}</span>` : ""}
@@ -772,13 +934,9 @@ function openRecipe(id) {
 
     <div class="detail-section">
       <h3>Ingredients</h3>
+      ${scaleBarHtml()}
       <div id="ingredients-checklist">
-        ${recipe.ingredients.map((ing, i) => `
-          <div class="ingredient-item" onclick="toggleIngredient(this)" data-index="${i}">
-            <div class="ingredient-cb"></div>
-            <span class="ingredient-text">${escHtml(ing)}</span>
-          </div>
-        `).join("")}
+        ${detailIngredientsHtml(recipe)}
       </div>
     </div>
 
@@ -814,12 +972,8 @@ async function enterCookMode() {
 
   document.getElementById("cook-mode-title").textContent = recipe.title;
 
-  document.getElementById("cook-ingredients").innerHTML = recipe.ingredients.map((ing, i) => `
-    <div class="cook-ingredient" onclick="this.classList.toggle('checked')" data-index="${i}">
-      <div class="ingredient-cb"></div>
-      <span>${escHtml(ing)}</span>
-    </div>
-  `).join("");
+  document.getElementById("cook-scale-bar").innerHTML = scaleBarHtml();
+  document.getElementById("cook-ingredients").innerHTML = cookIngredientsHtml(recipe);
 
   document.getElementById("cook-steps").innerHTML = recipe.instructions.map((step, i) => `
     <div class="cook-step" onclick="this.classList.toggle('done')">
