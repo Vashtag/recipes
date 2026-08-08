@@ -1,22 +1,6 @@
 {
   "items": [
     {
-      "id": "97c5f224-77ca-449c-955c-5130e7d939af",
-      "qty": 1,
-      "unitKey": null,
-      "name": "yellow onion (chopped)",
-      "text": "1 yellow onion (chopped)",
-      "checked": false
-    },
-    {
-      "id": "34e30070-5770-44ab-a07f-801fa0255e72",
-      "qty": 3,
-      "unitKey": null,
-      "name": "potatoes (quartered, than halved)",
-      "text": "3 potatoes (quartered, than halved)",
-      "checked": false
-    },
-    {
       "id": "0edcea69-ed7e-4cc9-9cc9-8cf2b6aeb70d",
       "qty": 2.5,
       "unitKey": "tsp",
