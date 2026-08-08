@@ -984,7 +984,7 @@ function applyScale() {
   const cookList = document.getElementById("cook-ingredients");
   if (cookList) rerenderChecklist(cookList, cookIngredientsHtml(recipe), ".cook-ingredient");
 
-  const steps = document.getElementById("instructions-list");
+  const steps = document.getElementById("detail-instructions");
   if (steps) steps.innerHTML = detailInstructionsHtml(recipe);
 
   const cookSteps = document.getElementById("cook-steps");
@@ -1051,7 +1051,7 @@ function openRecipe(id) {
 
     <div class="detail-section">
       <h3>Instructions</h3>
-      <div id="instructions-list">
+      <div id="detail-instructions">
         ${detailInstructionsHtml(recipe)}
       </div>
     </div>
