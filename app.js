@@ -229,7 +229,6 @@ function recipeCardHtml(r) {
       <div class="card-body">
         ${[].concat(r.category||[]).length ? `<span class="card-category">${[].concat(r.category).map(escHtml).join(", ")}</span>` : ""}
         <h3>${escHtml(r.title)}</h3>
-        ${r.sourceUrl ? `<p class="card-source">${sourceDomain(r.sourceUrl)}</p>` : ""}
       </div>
     </div>
   `;
@@ -268,10 +267,6 @@ function renderFavouritesView() {
   }
   empty.classList.add("hidden");
   grid.innerHTML = favs.map(recipeCardHtml).join("");
-}
-
-function sourceDomain(url) {
-  try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return url; }
 }
 
 // ── Views ──────────────────────────────────────────
@@ -1317,7 +1312,7 @@ async function confirmResetPlan() {
 }
 
 // ── Category Browser ────────────────────────────────
-const CATEGORIES = ["Breakfast","Lunch","Dinner","Pasta","Soup","Salad","Cookie","Cake","Persian","Bread","Sourdough","Vegetarian","Other"];
+const CATEGORIES = ["Breakfast","Lunch","Dinner","Pasta","Soup","Salad","Cookie","Cake","Sweet Treat","Persian","Bread","Sourdough","Vegetarian","Other"];
 
 let activeCategories = [];
 
