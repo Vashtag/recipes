@@ -152,7 +152,8 @@ html, body {
 /* =====================================================
    RECIPE GRID
    ===================================================== */
-#recipe-grid {
+#recipe-grid,
+#favourites-view-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
@@ -223,14 +224,6 @@ html, body {
   letter-spacing: 0.06em;
   color: var(--orange);
   margin-bottom: 3px;
-}
-.card-source {
-  font-size: 0.72rem;
-  color: var(--muted);
-  margin-top: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* =====================================================
