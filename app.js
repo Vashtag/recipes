@@ -750,9 +750,6 @@ const QTY_SRC = `(?:\\d+\\s+\\d+\\s*\\/\\s*\\d+|\\d+\\s*[${UNI_CHARS}]|\\d+\\s*\
 // A quantity or a range of them: "1 1/2-2", "2 to 3"
 const RANGE_SRC = `${QTY_SRC}(?:\\s*(?:-|–|—|to)\\s*${QTY_SRC})?`;
 const RANGE_PARTS_RE = new RegExp(`^(${QTY_SRC})(?:\\s*(-|–|—|to)\\s*(${QTY_SRC}))?$`, "i");
-// Same, but matches a leading quantity at the START of a longer string (no end
-// anchor) — used to peel the amount off a full ingredient line.
-const RANGE_PREFIX_RE = new RegExp(`^(${QTY_SRC})(?:\\s*(-|–|—|to)\\s*(${QTY_SRC}))?`, "i");
 // Only scale a number that starts the line, opens a parenthetical, or follows an
 // alternative separator — so "2 cups" and "(¼ cup)" scale but "9x13 pan" and
 // "2% milk" do not.
@@ -1199,7 +1196,6 @@ const MEAL_PLAN_FILE = "data/mealplan.json";
 
 let mealPlan = {};
 let pickerTargetDay = null;
-let pickerMode = "planner"; // "planner" | "shopping"
 
 async function loadMealPlan() {
   try {
@@ -1262,27 +1258,12 @@ function renderPlanner() {
 }
 
 function openRecipePicker(dayKey) {
-  pickerMode = "planner";
   pickerTargetDay = dayKey;
   const dayIndex = DAY_KEYS.indexOf(dayKey);
   document.getElementById("picker-title").textContent = `${DAYS[dayIndex]} — pick a recipe`;
   document.getElementById("picker-search").value = "";
   renderPickerList();
   document.getElementById("picker-modal").classList.remove("hidden");
-}
-
-function openShoppingPicker() {
-  pickerMode = "shopping";
-  pickerTargetDay = null;
-  document.getElementById("picker-title").textContent = "Add a recipe to the list";
-  document.getElementById("picker-search").value = "";
-  renderPickerList();
-  document.getElementById("picker-modal").classList.remove("hidden");
-}
-
-function pickerChoose(recipeId) {
-  if (pickerMode === "shopping") addRecipeToShop(recipeId);
-  else assignRecipe(recipeId);
 }
 
 function renderPickerList() {
@@ -1294,7 +1275,7 @@ function renderPickerList() {
     return;
   }
   list.innerHTML = filtered.map(r => `
-    <div class="picker-item" onclick="pickerChoose('${r.id}')">
+    <div class="picker-item" onclick="assignRecipe('${r.id}')">
       ${r.image ? `<img class="picker-item-thumb" src="${escHtml(r.image)}" alt="" onerror="this.style.display='none'">` : `<div class="picker-item-thumb picker-item-thumb--empty">🍽️</div>`}
       <span>${escHtml(r.title)}</span>
     </div>
@@ -1334,71 +1315,7 @@ async function confirmResetPlan() {
 
 // ── Shopping List ──────────────────────────────────
 const SHOPPING_FILE = "data/shopping.json";
-let shoppingItems = []; // [{ id, qty, unitKey, name, text, checked }]
-
-// Canonical measuring units and how to render them. `abbr` units never pluralise.
-const SHOP_UNIT_TABLE = {
-  cup:{d:"cup"}, tbsp:{d:"tbsp",abbr:1}, tsp:{d:"tsp",abbr:1}, oz:{d:"oz",abbr:1},
-  lb:{d:"lb",abbr:1}, g:{d:"g",abbr:1}, kg:{d:"kg",abbr:1}, ml:{d:"ml",abbr:1},
-  l:{d:"l",abbr:1}, qt:{d:"qt",abbr:1}, pt:{d:"pt",abbr:1}, gal:{d:"gal",abbr:1},
-  clove:{d:"clove"}, stick:{d:"stick"}, can:{d:"can"}, slice:{d:"slice"},
-  pinch:{d:"pinch"}, sprig:{d:"sprig"}, handful:{d:"handful"}, scoop:{d:"scoop"},
-};
-const SHOP_UNIT_ALIASES = {
-  cup:"cup", cups:"cup", c:"cup",
-  tbsp:"tbsp", tbsps:"tbsp", tbs:"tbsp", tablespoon:"tbsp", tablespoons:"tbsp",
-  tsp:"tsp", tsps:"tsp", teaspoon:"tsp", teaspoons:"tsp",
-  oz:"oz", ozs:"oz", ounce:"oz", ounces:"oz",
-  lb:"lb", lbs:"lb", pound:"lb", pounds:"lb",
-  g:"g", gram:"g", grams:"g", kg:"kg", kilogram:"kg", kilograms:"kg",
-  ml:"ml", milliliter:"ml", millilitre:"ml", milliliters:"ml", millilitres:"ml",
-  l:"l", liter:"l", litre:"l", liters:"l", litres:"l",
-  quart:"qt", quarts:"qt", qt:"qt", pint:"pt", pints:"pt", pt:"pt",
-  gallon:"gal", gallons:"gal", gal:"gal",
-  clove:"clove", cloves:"clove", stick:"stick", sticks:"stick",
-  can:"can", cans:"can", slice:"slice", slices:"slice", pinch:"pinch", pinches:"pinch",
-  sprig:"sprig", sprigs:"sprig", handful:"handful", handfuls:"handful", scoop:"scoop", scoops:"scoop",
-};
-function shopCanonUnit(word) {
-  if (!word) return null;
-  return SHOP_UNIT_ALIASES[word.toLowerCase().replace(/\.$/, "")] || null;
-}
-function shopUnitDisplay(key, qty) {
-  const u = SHOP_UNIT_TABLE[key];
-  if (!u) return key;
-  return (!u.abbr && qty != null && qty > 1) ? u.d + "s" : u.d;
-}
-
-// Split "1 1/2 cups flour (sifted)" into { qty, unitKey, name, text }.
-// A quantity range ("1-2 cups") takes the upper bound, so you buy enough.
-function parseIngredient(line) {
-  const text = String(line || "").trim();
-  let rest = text, qty = null;
-  const m = text.match(RANGE_PREFIX_RE);
-  if (m) {
-    const lo = parseQty(m[1]);
-    const hi = m[3] ? parseQty(m[3]) : null;
-    qty = hi != null ? hi : lo;
-    if (qty != null) rest = text.slice(m[0].length).replace(/^\s+/, "");
-  }
-  let unitKey = null;
-  const um = rest.match(/^([a-zA-Z.]+)\b\s*/);
-  if (um) { const k = shopCanonUnit(um[1]); if (k) { unitKey = k; rest = rest.slice(um[0].length); } }
-  rest = rest.replace(/^[.\s,;:-]+/, "").replace(/^of\s+/i, "");
-  return { qty, unitKey, name: rest.trim(), text };
-}
-// Two items combine only when the canonical unit AND the normalised name match,
-// so quantities add up but distinct ingredients never merge.
-function shopMergeKey(it) {
-  const base = it.name.toLowerCase().replace(/\(.*?\)/g, "").split(",")[0].trim();
-  const words = base.split(/\s+/).map(normNoun).join(" ");
-  return `${it.unitKey || ""}|${words}`;
-}
-function shopItemText(it) {
-  if (it.qty == null) return it.text;
-  const u = it.unitKey ? " " + shopUnitDisplay(it.unitKey, it.qty) : "";
-  return `${formatQty(it.qty)}${u} ${it.name}`.replace(/\s+/g, " ").trim();
-}
+let shoppingItems = []; // [{ id, text, checked }]
 
 async function loadShoppingList() {
   try {
@@ -1436,23 +1353,6 @@ async function saveShoppingList() {
   shoppingSha = data.content.sha;
 }
 
-// Add ingredient lines, combining with matching unticked items already on the list.
-function addLinesToShop(lines) {
-  let added = 0;
-  for (const line of lines) {
-    const it = parseIngredient(line);
-    if (!it.text) continue;
-    if (it.qty != null) {
-      const key = shopMergeKey(it);
-      const match = shoppingItems.find(x => !x.checked && x.qty != null && shopMergeKey(x) === key);
-      if (match) { match.qty += it.qty; added++; continue; }
-    }
-    shoppingItems.push({ id: crypto.randomUUID(), qty: it.qty, unitKey: it.unitKey, name: it.name, text: it.text, checked: false });
-    added++;
-  }
-  return added;
-}
-
 async function persistShop(afterMsg) {
   const snapshot = JSON.stringify(shoppingItems);
   renderShoppingList();
@@ -1466,31 +1366,11 @@ async function persistShop(afterMsg) {
   }
 }
 
-async function addRecipeToShop(recipeId) {
-  const recipe = recipes.find(r => r.id === recipeId);
-  closeRecipePicker();
-  if (!recipe) return;
-  const n = addLinesToShop(recipe.ingredients || []);
-  await persistShop(`Added ${n} item${n === 1 ? "" : "s"} from ${recipe.title}.`);
-}
-
-async function addMealPlanToShop() {
-  await loadMealPlan();
-  const ids = [...new Set(Object.values(mealPlan).filter(Boolean))];
-  if (ids.length === 0) { showToast("No recipes in the meal plan yet."); return; }
-  let n = 0;
-  for (const id of ids) {
-    const recipe = recipes.find(r => r.id === id);
-    if (recipe) n += addLinesToShop(recipe.ingredients || []);
-  }
-  await persistShop(`Added ${n} item${n === 1 ? "" : "s"} from ${ids.length} planned meal${ids.length === 1 ? "" : "s"}.`);
-}
-
 function addManualShopItem() {
   const input = document.getElementById("shop-manual-input");
   const val = input.value.trim();
   if (!val) return;
-  addLinesToShop([val]);
+  shoppingItems.push({ id: crypto.randomUUID(), text: val, checked: false });
   input.value = "";
   input.focus();
   persistShop();
@@ -1544,7 +1424,7 @@ function renderShoppingList() {
   list.innerHTML = ordered.map(it => `
     <div class="shop-item${it.checked ? " checked" : ""}" onclick="toggleShopItem('${it.id}')">
       <div class="ingredient-cb"></div>
-      <span class="shop-item-text">${escHtml(shopItemText(it))}</span>
+      <span class="shop-item-text">${escHtml(it.text)}</span>
       <button class="shop-remove-btn" onclick="event.stopPropagation();removeShopItem('${it.id}')" title="Remove">✕</button>
     </div>
   `).join("");
