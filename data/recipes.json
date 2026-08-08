@@ -40,7 +40,9 @@
     "id": "5c335fc4-3525-47c5-96e7-4b82bd17d441",
     "title": "Apricot & Pistachio Buns",
     "image": "https://www.baking-sense.com/wp-content/uploads/2016/06/apricot-pistachio-buns-13a-480x270.jpg",
-    "category": [],
+    "category": [
+      "Sweet Treat"
+    ],
     "servings": "12 servings",
     "prepTime": "",
     "cookTime": "",
