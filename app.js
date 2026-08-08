@@ -762,6 +762,36 @@ const QTY_SUFFIX_SKIP_RE = /^\s*(?:%|°|x\s*\d)/i;
 // package size, not an amount, so it stays as-is.
 const PACKAGE_SIZE_RE = /^[^()]*\)\s*(?:can|jar|tin|box|bag|pkg|package|bottle|container|block|stick|carton|loaf|log)s?\b/i;
 
+// Instructions are prose, so a number there is only treated as an amount when a
+// measuring unit follows it. Deliberately excludes minutes/hours/inches/degrees.
+const MEASURE_UNITS = [
+  "cups?", "c\\.", "tablespoons?", "tbsps?\\.?", "tbs\\.?", "teaspoons?", "tsps?\\.?",
+  "fl\\.?\\s*ozs?\\.?", "ozs?\\.?", "ounces?", "lbs?\\.?", "pounds?",
+  "g", "gs", "grams?", "kgs?", "kilograms?", "mls?", "millilit(?:er|re)s?",
+  "lit(?:er|re)s?", "quarts?", "qts?\\.?", "pints?", "pts?\\.?", "gallons?", "gals?\\.?",
+  "sticks?", "cloves?", "sprigs?", "handfuls?", "pinch(?:es)?", "dashes|dash", "scoops?",
+];
+const UNIT_AFTER_RE = new RegExp(`^\\s*(?:${MEASURE_UNITS.join("|")})\\b`, "i");
+// Spelled-out units get their plural fixed up after scaling ("2 tablespoon" →
+// "2 tablespoons"). Abbreviations like "tbsp" are left exactly as written.
+const PLURAL_UNITS = [
+  "cup", "tablespoon", "teaspoon", "ounce", "pound", "gram", "kilogram",
+  "millilitre", "milliliter", "litre", "liter", "quart", "pint", "gallon",
+  "clove", "stick", "sprig", "handful", "scoop", "slice",
+];
+const PLURAL_UNIT_AFTER_RE = new RegExp(`^(\\s+)(${PLURAL_UNITS.join("|")})(s?)\\b`, "i");
+// "add the flour 1 cup at a time" is a technique, not an amount.
+const TECHNIQUE_RE = /^\s*\S+\s+at\s+a\s+time\b/i;
+// Words that look like ingredient nouns but never mean one.
+const NOT_INGREDIENT_WORDS = new Set([
+  "minute", "minutes", "min", "mins", "hour", "hours", "hr", "hrs", "second", "seconds", "sec", "secs",
+  "day", "days", "week", "weeks", "degree", "degrees", "inch", "inches", "cm", "mm", "time", "times",
+  "batch", "batches", "piece", "pieces", "portion", "portions", "half", "halves", "third", "thirds",
+  "quarter", "quarters", "side", "sides", "layer", "layers", "step", "steps", "pan", "pans",
+  "oven", "sheet", "sheets", "tray", "trays", "bowl", "bowls", "pot", "pots", "skillet",
+  "heat", "medium", "high", "low", "more", "the", "and", "for", "with", "until", "about", "into", "over",
+]);
+
 function parseQty(str) {
   const s = String(str).trim();
   let m;
@@ -796,11 +826,13 @@ function formatQty(value) {
 function gcd(a, b) { return b ? gcd(b, a % b) : a; }
 
 // Multiply every quantity in a free-form line ("1 1/2 cups flour") by factor.
-// When asHtml is true the result is escaped and scaled numbers are highlighted.
-function scaleText(text, factor, asHtml) {
+// opts.html escapes the result and highlights scaled numbers. opts.nouns turns on
+// prose mode: a number is only an amount if a unit or a known ingredient follows.
+function scaleText(text, factor, asHtml, opts) {
   const src = String(text || "");
   const esc = s => asHtml ? escHtml(s) : s;
   if (!factor || factor === 1) return esc(src);
+  const nouns = opts && opts.nouns;
 
   const re = new RegExp(RANGE_SRC, "gi");
   let out = "", last = 0, m;
@@ -808,17 +840,26 @@ function scaleText(text, factor, asHtml) {
     if (m[0] === "") { re.lastIndex++; continue; }
     const before = src.slice(0, m.index);
     const after = src.slice(m.index + m[0].length);
-    if (!QTY_PREFIX_RE.test(before) || QTY_SUFFIX_SKIP_RE.test(after)) continue;
+    if (QTY_SUFFIX_SKIP_RE.test(after)) continue;
     if (PACKAGE_SIZE_RE.test(after)) continue;
+    if (nouns) {
+      if (/[\d.,]$/.test(before) || /\dx$/i.test(before)) continue;  // mid-number, or "9x13"
+      if (TECHNIQUE_RE.test(after)) continue;
+      if (!UNIT_AFTER_RE.test(after) && !startsWithNoun(after, nouns)) continue;
+    } else if (!QTY_PREFIX_RE.test(before)) {
+      continue;
+    }
 
     const parts = m[0].match(RANGE_PARTS_RE);
     if (!parts) continue;
     const lo = parseQty(parts[1]);
     if (lo === null) continue;
     let scaled = formatQty(lo * factor);
+    let finalValue = lo * factor;
     if (parts[3]) {
       const hi = parseQty(parts[3]);
       if (hi === null) continue;
+      finalValue = hi * factor;
       scaled += `${parts[2] === "to" ? " to " : parts[2]}${formatQty(hi * factor)}`;
     }
     if (!scaled) continue;
@@ -826,8 +867,44 @@ function scaleText(text, factor, asHtml) {
     out += esc(src.slice(last, m.index));
     out += asHtml ? `<span class="qty-scaled">${escHtml(scaled)}</span>` : scaled;
     last = m.index + m[0].length;
+
+    // Keep the unit agreeing with the new number: "2 tablespoon" → "2 tablespoons".
+    const unit = after.match(PLURAL_UNIT_AFTER_RE);
+    if (unit) {
+      const plural = finalValue > 1;
+      out += esc(unit[1] + unit[2] + (plural ? (unit[3] || "s") : ""));
+      last += unit[0].length;
+    }
   }
   return out + esc(src.slice(last));
+}
+
+// Naive singular/plural fold so "1 onion" matches an "onions" ingredient.
+function normNoun(word) {
+  const w = word.toLowerCase();
+  if (w.endsWith("ies") && w.length > 4) return w.slice(0, -3) + "y";
+  if (w.endsWith("es") && w.length > 3) return w.slice(0, -2);
+  if (w.endsWith("s") && w.length > 2) return w.slice(0, -1);
+  return w;
+}
+
+// The nouns a recipe's own ingredient list mentions — the vocabulary that makes
+// "add the 3 potatoes" recognisable as an amount rather than a stray number.
+function ingredientNouns(recipe) {
+  const nouns = new Set();
+  for (const line of recipe.ingredients || []) {
+    for (const word of String(line).toLowerCase().match(/[a-z]+/g) || []) {
+      if (word.length < 3 || NOT_INGREDIENT_WORDS.has(word)) continue;
+      if (UNIT_AFTER_RE.test(word)) continue;
+      nouns.add(normNoun(word));
+    }
+  }
+  return nouns;
+}
+
+function startsWithNoun(after, nouns) {
+  const m = after.match(/^\s+([a-z]+)/i);
+  return !!m && !NOT_INGREDIENT_WORDS.has(m[1].toLowerCase()) && nouns.has(normNoun(m[1]));
 }
 
 function scaleLabel(f) {
@@ -854,6 +931,26 @@ function detailIngredientsHtml(recipe) {
     <div class="ingredient-item" onclick="toggleIngredient(this)" data-index="${i}">
       <div class="ingredient-cb"></div>
       <span class="ingredient-text">${scaleText(ing, currentScale, true)}</span>
+    </div>
+  `).join("");
+}
+
+function detailInstructionsHtml(recipe) {
+  const nouns = ingredientNouns(recipe);
+  return recipe.instructions.map((step, i) => `
+    <div class="instruction-step">
+      <div class="step-num">${i + 1}</div>
+      <div>${scaleText(step, currentScale, true, { nouns })}</div>
+    </div>
+  `).join("");
+}
+
+function cookInstructionsHtml(recipe) {
+  const nouns = ingredientNouns(recipe);
+  return recipe.instructions.map((step, i) => `
+    <div class="cook-step" onclick="this.classList.toggle('done')">
+      <div class="step-num">${i + 1}</div>
+      <div>${scaleText(step, currentScale, true, { nouns })}</div>
     </div>
   `).join("");
 }
@@ -886,6 +983,18 @@ function applyScale() {
 
   const cookList = document.getElementById("cook-ingredients");
   if (cookList) rerenderChecklist(cookList, cookIngredientsHtml(recipe), ".cook-ingredient");
+
+  const steps = document.getElementById("instructions-list");
+  if (steps) steps.innerHTML = detailInstructionsHtml(recipe);
+
+  const cookSteps = document.getElementById("cook-steps");
+  if (cookSteps) {
+    const done = [...cookSteps.querySelectorAll(".cook-step")].map(el => el.classList.contains("done"));
+    cookSteps.innerHTML = cookInstructionsHtml(recipe);
+    cookSteps.querySelectorAll(".cook-step").forEach((el, i) => {
+      if (done[i]) el.classList.add("done");
+    });
+  }
 }
 
 function rerenderChecklist(container, html, itemSelector) {
@@ -942,12 +1051,9 @@ function openRecipe(id) {
 
     <div class="detail-section">
       <h3>Instructions</h3>
-      ${recipe.instructions.map((step, i) => `
-        <div class="instruction-step">
-          <div class="step-num">${i + 1}</div>
-          <div>${escHtml(step)}</div>
-        </div>
-      `).join("")}
+      <div id="instructions-list">
+        ${detailInstructionsHtml(recipe)}
+      </div>
     </div>
   `;
 
@@ -975,12 +1081,7 @@ async function enterCookMode() {
   document.getElementById("cook-scale-bar").innerHTML = scaleBarHtml();
   document.getElementById("cook-ingredients").innerHTML = cookIngredientsHtml(recipe);
 
-  document.getElementById("cook-steps").innerHTML = recipe.instructions.map((step, i) => `
-    <div class="cook-step" onclick="this.classList.toggle('done')">
-      <div class="step-num">${i + 1}</div>
-      <div>${escHtml(step)}</div>
-    </div>
-  `).join("");
+  document.getElementById("cook-steps").innerHTML = cookInstructionsHtml(recipe);
 
   document.getElementById("cook-mode").classList.remove("hidden");
   document.body.classList.add("cook-mode-open");
