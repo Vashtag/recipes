@@ -1,22 +1,6 @@
 {
   "items": [
     {
-      "id": "2cd34af3-a240-4446-a926-f28881a7de46",
-      "qty": 4,
-      "unitKey": "cup",
-      "name": "green beans",
-      "text": "4 cups green beans",
-      "checked": false
-    },
-    {
-      "id": "a06d2065-7852-4cbd-bee2-0a65829a2835",
-      "qty": 3,
-      "unitKey": null,
-      "name": "large tomatoes / 1 can diced tomatoes",
-      "text": "3 large tomatoes / 1 can diced tomatoes",
-      "checked": false
-    },
-    {
       "id": "97f0184c-7a2c-4155-9d17-ba8f6180d395",
       "qty": 2,
       "unitKey": "tsp",
