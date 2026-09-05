@@ -1,5 +1,35 @@
 [
   {
+    "id": "af60876b-4d44-4a2c-b0e3-e0a2bb329c03",
+    "title": "Artisan Bread",
+    "image": "https://sallysbakingaddiction.com/wp-content/uploads/2019/12/homemade-crusty-artisan-bread.jpg",
+    "category": [
+      "Bread"
+    ],
+    "servings": "2",
+    "prepTime": "25 mins",
+    "cookTime": "",
+    "sourceUrl": "https://sallysbakingaddiction.com/homemade-artisan-bread/",
+    "notes": "",
+    "ingredients": [
+      "3 and 1/4 cups bread flour",
+      "2 teaspoons instant yeast",
+      "2 teaspoons coarse salt",
+      "1 and 1/2 cups water (room temperature)"
+    ],
+    "instructions": [
+      "In a large ungreased mixing bowl, whisk the flour, yeast, and salt together. Pour in the water and gently mix together with a silicone spatula or wooden spoon. The dough will seem dry and shaggy, but keep working it until all the flour is moistened. If needed, use your hands (as I do in the video tutorial below) to work the dough ingredients together. The dough will be sticky. Shape into a ball in the bowl as best you can.",
+      "Keeping the dough in the bowl, cover the dough tightly with plastic wrap or aluminum foil and set on the counter at room temperature. Allow to rise for 2-3 hours. The dough will just about double in size, stick to the sides of the bowl, and have a lot of air bubbles.",
+      "You can continue with step 4 immediately, but for absolute best flavor and texture, I strongly recommend letting this risen dough rest in the refrigerator for at least 12 hours and up to 3 days. Place covered dough in the refrigerator for 12 hours – 3 days. I usually let it rest in the refrigerator for about 18 hours. The dough will puff up during this time, but may begin to deflate after 2 days.",
+      "Lightly dust a large nonstick baking sheet (with or without rims and make sure it’s nonstick) with flour and/or cornmeal. Turn the cold dough out onto a floured work surface. Using a sharp knife or bench scraper, cut dough in half. Some air bubbles will deflate as you work with it. Place dough halves on prepared baking sheet. Using floured hands, shape into 2 long loaves about 9×3 inches each (doesn’t have to be exact) about 3 inches apart. Loosely cover and allow to rest for 45 minutes. You will bake the dough on this prepared baking sheet.",
+      "During this 45 minutes, preheat the oven to 475°F (246°C).",
+      "When ready to bake, score the bread loaves with 3 slashes, about 1/2 inch deep. If the shaped loaves flattened out during the 45 minutes, use floured hands to narrow them out along the sides again.",
+      "Optional -- for a slightly crispier crust: After the oven is preheated and bread is scored, place a shallow metal or cast iron baking pan or skillet (I usually use a metal 9×13-inch baking pan) on the bottom oven rack. Carefully and quickly pour 3-4 cups of boiling water into it. Place the scored dough/baking pan on a higher rack and quickly shut the oven, trapping the steam inside. The steam helps create a crispier crust",
+      "Place the shaped and scored dough (on the flour/cornmeal dusted pan) in the preheated oven on the center rack. Bake for 20-25 minutes or until the crust is golden brown. Gently tap the loaves—if they sound hollow, the bread is done."
+    ],
+    "addedAt": "2026-09-05T16:39:25.785Z"
+  },
+  {
     "id": "9520cdf9-41f1-4461-acb9-b917a4aae9ac",
     "title": "Fasolakia (Greek Bean Stew)",
     "image": "https://www.foodbymaria.com/wp-content/uploads/2023/10/Fasolakia-_-5-480x270.jpg",
