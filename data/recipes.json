@@ -1,5 +1,43 @@
 [
   {
+    "id": "16dc9abc-6028-4f17-9ee3-881e09a3d4d8",
+    "title": "The Best Day Ever [And A Recipe For Apple + Oat Bread] — Coffee + Crumbs",
+    "image": "http://static1.squarespace.com/static/5313b7c3e4b08cb68817cf91/t/5f8a08c3657662175509e8f2/1602881783338/Apple+%2B+Oat+Bread+_+Sarah+J.+Hauser-10.jpg?format=1500w",
+    "category": [
+      "Sweet Treat"
+    ],
+    "servings": "1 loaf",
+    "prepTime": "",
+    "cookTime": "",
+    "sourceUrl": "https://www.coffeeandcrumbs.net/blog/2020/10/30/the-best-day-ever-and-a-recipe-for-apple-oat-bread",
+    "notes": "",
+    "ingredients": [
+      "1 ¼ cups all-purpose flour",
+      "¾ cup rolled oats",
+      "⅔ cup sugar",
+      "1 teaspoon baking powder",
+      "1 teaspoon kosher salt",
+      "¾ teaspoon cinnamon",
+      "½ teaspoon baking soda",
+      "2 eggs, lightly beaten",
+      "½ cup unsalted butter (1 stick), melted and cooled",
+      "½ cup plain yogurt",
+      "1 teaspoon vanilla extract",
+      "1 cup shredded apples",
+      "Turbinado sugar and thinly sliced apples for topping (optional)"
+    ],
+    "instructions": [
+      "Preheat the oven to 350 degrees. Grease and flour an 8x4-inch loaf pan. Set aside.",
+      "In a medium bowl, mix together the flour, oats, sugar, baking powder, salt, cinnamon, and baking soda.",
+      "In a separate bowl, whisk together the eggs, butter, yogurt, and vanilla.",
+      "Gradually add the dry flour mixture to the wet ingredients. Mix gently just until incorporated. Fold in the shredded apples, being careful not to overmix.",
+      "Pour the batter into the prepared loaf pan. Top with a few thinly sliced apples and sprinkle with turbinado sugar, if desired.",
+      "Bake for 45-55 minutes, or until a toothpick inserted comes out clean. Allow the bread to cool in the pan for 10-15 minutes, then turn out onto a wire rack. Serve warm with a bit (or a lot) of butter.",
+      "This bread is best when fresh, but leftovers can be wrapped and refrigerated for a couple days. Rewarm in the microwave (seriously–it’s so good when served warm with butter!). Enjoy!"
+    ],
+    "addedAt": "2026-11-17T17:26:12.957Z"
+  },
+  {
     "id": "af60876b-4d44-4a2c-b0e3-e0a2bb329c03",
     "title": "Artisan Bread",
     "image": "https://sallysbakingaddiction.com/wp-content/uploads/2019/12/homemade-crusty-artisan-bread.jpg",
