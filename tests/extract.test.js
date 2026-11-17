@@ -239,3 +239,33 @@ test("suggests categories from recipeCategory, cuisine, keywords and title", () 
   assert.deepEqual(r.category.sort(), ["Bread", "Persian", "Sourdough", "Sweet Treat", "Vegetarian"]);
   assert.ok(!r.category.includes("Other"));
 });
+
+// ── Hand-written blog posts (Squarespace and similar) ────
+
+test("Squarespace-style post: headings and <br> paragraphs in separate blocks", () => {
+  const block = inner => `<div class="sqs-block html-block"><div class="sqs-block-content">${inner}</div></div>`;
+  const html = page(`<meta property="og:title" content="The Best Day Ever, and a Recipe for Apple Oat Bread">`,
+    `<article>
+      ${block(`<p>It was a lovely autumn day and we walked for hours through the orchard, talking about everything and nothing, and when we got home I wanted something warm.</p>`)}
+      ${block(`<h3>Apple Oat Bread</h3>`)}
+      ${block(`<p><strong>Ingredients:</strong></p>`)}
+      ${block(`<p>1 1/2 cups flour<br>1 cup rolled oats<br>2 apples, grated</p>`)}
+      ${block(`<p><strong>For the topping:</strong></p><p>2 tbsp sugar<br>1 tsp cinnamon</p>`)}
+      ${block(`<p><strong>Method</strong></p>`)}
+      ${block(`<p>1. Preheat the oven to 350F.</p><p>2. Mix everything together.</p><p>3. Bake for 50 minutes.</p>`)}
+      ${block(`<p><strong>Notes</strong></p><p>Keeps for 3 days.</p>`)}
+    </article>
+    <footer><p><strong>Ingredients</strong></p><p>not this</p></footer>`);
+  const r = extract(html, "https://www.coffeeandcrumbs.net/blog/2020/10/30/apple-oat-bread");
+  assert.equal(r.title, "The Best Day Ever, and a Recipe for Apple Oat Bread");
+  assert.deepEqual(r.ingredients, ["1 1/2 cups flour", "1 cup rolled oats", "2 apples, grated", "— Topping —", "2 tbsp sugar", "1 tsp cinnamon"]);
+  assert.deepEqual(r.instructions, ["Preheat the oven to 350F.", "Mix everything together.", "Bake for 50 minutes."]);
+  assert.ok(r.category.includes("Bread"));
+  assert.equal(r.partial, false);
+});
+
+test("ingredient section ends where the post's prose resumes", () => {
+  const html = page("", `<h2>Ingredients</h2><p>1 egg<br>1 cup milk</p>
+    <p>${"This is a long paragraph of the story that follows the ingredients and should never be treated as an ingredient line at all. ".repeat(2)}</p>`);
+  assert.deepEqual(extract(html).ingredients, ["1 egg", "1 cup milk"]);
+});
