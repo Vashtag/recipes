@@ -403,8 +403,10 @@ function findRecipeBySource(url) {
 }
 
 // ── Proxies (raced in parallel; the first usable page wins) ────
-const PROXY_TIMEOUT_MS = 15000;
-const PROXIES = [
+// Free public proxies come and go, so several are tried at once. For a
+// reliable setup, deploy proxy/worker.js and set CONFIG.corsProxy.
+const PROXY_TIMEOUT_MS = 20000;
+const PUBLIC_PROXIES = [
   {
     name: "allorigins",
     url: (u) => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
@@ -417,39 +419,71 @@ const PROXIES = [
     },
   },
   {
-    name: "corsproxy",
-    url: (u) => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
-    read: (res) => res.text(),
+    name: "allorigins raw",
+    url: (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
   },
   {
     name: "codetabs",
     url: (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
-    read: (res) => res.text(),
+  },
+  {
+    name: "corsproxy",
+    url: (u) => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+  },
+  {
+    // Jina Reader loads the page in a real browser, which gets past some
+    // sites that turn away the other proxies. Asked for HTML, not Markdown.
+    name: "jina",
+    url: (u) => `https://r.jina.ai/${u}`,
+    init: { headers: { "X-Return-Format": "html" } },
   },
 ];
 
+function activeProxies() {
+  const custom = (typeof CONFIG !== "undefined" && CONFIG.corsProxy || "").trim();
+  if (!custom) return PUBLIC_PROXIES;
+  const own = {
+    name: "your proxy",
+    url: (u) => custom.includes("{url}") ? custom.replace("{url}", encodeURIComponent(u)) : custom + encodeURIComponent(u),
+  };
+  return [own, ...PUBLIC_PROXIES];
+}
+
 class SiteError extends Error {
   constructor(status) {
-    super(`The recipe site returned an error (${status}).`);
+    super(`HTTP ${status}`);
     this.status = status;
   }
 }
 class BlockedError extends Error {}
 
-async function fetchViaProxy(url) {
-  const controllers = PROXIES.map(() => new AbortController());
+// Short reason for the error message, e.g. "timed out", "HTTP 403".
+function proxyFailureReason(e) {
+  if (e instanceof BlockedError) return "bot check page";
+  if (e instanceof SiteError) return `HTTP ${e.status}`;
+  if (e?.name === "AbortError") return "timed out";
+  if (e instanceof TypeError) return "unreachable"; // network or CORS failure
+  return e?.message || "failed";
+}
 
-  const attempts = PROXIES.map(async (proxy, i) => {
+async function fetchViaProxy(url) {
+  const proxies = activeProxies();
+  const controllers = proxies.map(() => new AbortController());
+  const failures = [];
+
+  const attempts = proxies.map(async (proxy, i) => {
     const ctrl = controllers[i];
     const timer = setTimeout(() => ctrl.abort(), PROXY_TIMEOUT_MS);
     try {
-      const res = await fetch(proxy.url(url), { signal: ctrl.signal });
-      // Proxies that pass the site's status through: 4xx/5xx from the site.
+      const res = await fetch(proxy.url(url), { ...(proxy.init || {}), signal: ctrl.signal });
       if (!res.ok) throw new SiteError(res.status);
-      const html = await proxy.read(res);
+      const html = proxy.read ? await proxy.read(res) : await res.text();
       if (!html || html.length < 200) throw new Error("empty page");
       if (RecipeExtract.looksBlocked(html)) throw new BlockedError("blocked");
       return html;
+    } catch (e) {
+      failures.push({ name: proxy.name, error: e });
+      throw e;
     } finally {
       clearTimeout(timer);
     }
@@ -459,16 +493,17 @@ async function fetchViaProxy(url) {
     const html = await Promise.any(attempts);
     controllers.forEach(c => c.abort()); // stop the slower proxies
     return html;
-  } catch (agg) {
-    const errors = agg.errors || [];
+  } catch {
+    const detail = failures.map(f => `${f.name}: ${proxyFailureReason(f.error)}`).join(", ");
+    console.warn("All proxies failed for", url, failures);
+    const errors = failures.map(f => f.error);
     if (errors.some(e => e instanceof BlockedError)) {
-      throw new Error("This site blocks automated access (it showed a bot check instead of the recipe). Use Manual Entry, or try the site's print view link.");
+      throw new Error(`This site blocks automated access (it showed a bot check instead of the recipe). Use Manual Entry. (${detail})`);
     }
-    const siteErr = errors.find(e => e instanceof SiteError && e.status !== 403 && e.status !== 429);
-    if (siteErr && siteErr.status === 404) {
-      throw new Error("That page wasn't found (404). Check the link and try again.");
+    if (errors.filter(e => e instanceof SiteError && e.status === 404).length >= 2) {
+      throw new Error(`That page wasn't found (404). Check the link and try again. (${detail})`);
     }
-    throw new Error("Could not fetch the page through any proxy. Check your internet connection, or use Manual Entry.");
+    throw new Error(`Could not fetch the page through any proxy. The free proxies may be down or rate-limited; try again in a minute, or use Manual Entry. (${detail})`);
   }
 }
 

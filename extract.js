@@ -444,31 +444,96 @@
     return null;
   }
 
-  // ── Strategy 4: headings followed by lists ─────────
-  function listAfterHeading(doc, re) {
-    const headings = [...doc.querySelectorAll("h1,h2,h3,h4,h5,h6,strong,b,p")]
-      .filter(h => h.textContent.length < 60 && re.test(h.textContent.trim()));
-    for (const h of headings) {
-      // Walk forward through following elements until a list turns up
-      // or another heading starts a new section.
-      let el = h.closest("h1,h2,h3,h4,h5,h6,p") || h;
-      for (let i = 0; i < 6 && el; i++) {
-        el = el.nextElementSibling;
-        if (!el) break;
-        if (/^H[1-6]$/.test(el.nodeName.toUpperCase())) break;
-        const list = /^(UL|OL)$/.test(el.nodeName.toUpperCase()) ? el : el.querySelector("ul,ol");
-        if (list) {
-          const items = [...list.querySelectorAll(":scope > li")].map(li => toLines(nodeToText(li)).join(" ")).filter(Boolean);
-          if (items.length >= 2) return items;
+  // ── Strategy 4: headings followed by lists or paragraphs ──
+  // For hand-written blog posts (Squarespace, Blogger, plain WordPress):
+  // an "Ingredients" heading followed by a list, or by paragraphs whose
+  // lines are split with <br>. The heading and its content often sit in
+  // separate content blocks, so this scans forward in document order
+  // rather than only through siblings.
+  const INGREDIENTS_RE = /^ingredients?\b/i;
+  const STEPS_RE = /^(instructions?|directions?|method|preparation|steps|how to make( it)?)\b/i;
+  const STEP_NUM_RE = /^\s*(?:step\s*)?\d{1,2}[.):]\s+/i;
+  const POST_BODY_SEL = "article, [itemprop~='articleBody'], .entry-content, .post-content, .post-body, .blog-item-content, .sqs-html-content-wrapper, main";
+  const STOP_RE = /^(notes?|tips?|nutrition|serving suggestions?|storage|equipment|comments?|share|related|you may also like|print|recipe notes)\b/i;
+
+  // Text of a short element that is styled as a heading.
+  function headingText(el) {
+    const tag = el.nodeName.toUpperCase();
+    const text = el.textContent.replace(/\s+/g, " ").trim();
+    if (!text || text.length > 60) return null;
+    if (/^H[1-6]$/.test(tag)) return text;
+    if (tag === "P" || tag === "DIV") {
+      // A paragraph that is all bold/strong/em, e.g. <p><strong>Ingredients</strong></p>.
+      const strong = [...el.querySelectorAll("strong, b, em, u, span")]
+        .map(x => x.textContent.replace(/\s+/g, " ").trim()).join(" ").trim();
+      if (strong && strong.length >= text.length * 0.9) return text;
+      if (/:$/.test(text) && text.split(" ").length <= 5) return text;
+    }
+    return null;
+  }
+
+  function linesAfterHeading(doc, re) {
+    const els = [...doc.body.querySelectorAll("h1,h2,h3,h4,h5,h6,p,ul,ol")]
+      .filter(el => !el.closest("nav, header, footer, aside, form, .comments, #comments"));
+    for (let i = 0; i < els.length; i++) {
+      const h = headingText(els[i]);
+      if (!h || !re.test(h.replace(/:$/, ""))) continue;
+      const out = [];
+      const isIngredients = re === INGREDIENTS_RE;
+      let tookList = false;
+      let numbered = null; // are paragraph steps written "1. ...", "2. ..."?
+      // Stay inside the post body the heading belongs to.
+      const container = els[i].closest(POST_BODY_SEL);
+      for (let j = i + 1; j < els.length && j < i + 60 && out.length < 40; j++) {
+        const el = els[j];
+        const tag = el.nodeName.toUpperCase();
+        if (container && !container.contains(el)) break;
+        if (el.closest("li")) continue; // paragraphs inside list items are read with the list
+        const ht = headingText(el);
+        if (ht) {
+          const t = ht.replace(/:$/, "");
+          // A sub-heading like "For the glaze:" inside the ingredient list.
+          if (out.length && !INGREDIENTS_RE.test(t) && !STEPS_RE.test(t) && !STOP_RE.test(t) && /^for\b|:$/i.test(ht)) {
+            out.push(sectionHeader(t.replace(/^for the\s+/i, "").replace(/^\w/, c => c.toUpperCase())));
+            continue;
+          }
+          if (out.length || /^H[1-6]$/.test(tag)) break;
+          continue;
         }
+        if (tag === "UL" || tag === "OL") {
+          if (el.parentElement && el.parentElement.closest("ul, ol")) continue; // nested list
+          out.push(...[...el.querySelectorAll(":scope > li")].map(li => toLines(nodeToText(li)).join(" ")).filter(Boolean));
+          tookList = true;
+          continue;
+        }
+        // Paragraph: each <br>-separated line is one item.
+        const lines = toLines(nodeToText(el));
+        if (!lines.length) continue;
+        if (tookList || STOP_RE.test(lines[0])) break; // prose after the list
+        // Ingredient lines are short; a long line means the post's prose resumed.
+        if (isIngredients && lines.some(l => l.length > 160)) break;
+        if (!isIngredients) {
+          const isNum = STEP_NUM_RE.test(lines[0]);
+          if (numbered === null) numbered = isNum;
+          else if (numbered && !isNum) break; // numbered steps ended
+        }
+        out.push(...lines);
       }
+      const items = out.filter(l => sectionHeaderNameOf(l) == null);
+      if (items.length >= 2) return out;
     }
     return [];
   }
 
+  function sectionHeaderNameOf(line) {
+    const m = String(line).match(/^\s*—\s*(.+?)\s*—\s*$/);
+    return m ? m[1] : null;
+  }
+
   function extractHeadingLists(doc) {
-    const ingredients = listAfterHeading(doc, /^ingredients?\b/i);
-    const instructions = listAfterHeading(doc, /^(instructions?|directions?|method|preparation|steps)\b/i);
+    const ingredients = linesAfterHeading(doc, INGREDIENTS_RE);
+    const instructions = linesAfterHeading(doc, STEPS_RE)
+      .map(l => l.replace(STEP_NUM_RE, "")); // drop "1." numbering
     if (!ingredients.length && !instructions.length) return null;
     return { title: "", image: "", servings: "", prepTime: "", cookTime: "", totalTime: "", description: "", ingredients, instructions, tags: [] };
   }
