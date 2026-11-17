@@ -335,33 +335,58 @@ function setupImagePreview() {
 // ── Recipe URL Fetch ───────────────────────────────
 async function fetchRecipe() {
   const urlInput = document.getElementById("recipe-url");
-  const url = urlInput.value.trim();
   const errEl = document.getElementById("fetch-error");
-  errEl.classList.add("hidden");
+  hideMessage(errEl);
 
+  let url = urlInput.value.trim();
   if (!url) {
     showError(errEl, "Please enter a URL.");
     return;
   }
-  try { new URL(url); } catch {
+  // Accept "example.com/recipe" without the scheme.
+  if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(url)) url = `https://${url}`;
+  try {
+    if (!/^https?:$/.test(new URL(url).protocol)) throw new Error();
+  } catch {
     showError(errEl, "That doesn't look like a valid URL.");
     return;
   }
+  url = RecipeExtract.normalizeSourceUrl(url);
+  urlInput.value = url;
 
   setFetchLoading(true);
 
   try {
     const html = await fetchViaProxy(url);
-    const parsed = parseRecipeFromHtml(html, url);
-    if (!parsed) {
+    const categories = [...document.querySelectorAll("#category-checks input")].map(cb => cb.value);
+    const parsed = RecipeExtract.extractRecipe(html, url, { categories });
+    if (!parsed.found) {
       throw new Error("Could not find recipe data on this page. Switch to Manual Entry and fill in the details.");
     }
-    populateEditForm(parsed);
+
+    const notes = [];
+    if (parsed.description) notes.push(parsed.description);
+    if (parsed.totalTime && !parsed.cookTime && parsed.totalTime !== parsed.prepTime) {
+      notes.push(`Total time: ${parsed.totalTime}`);
+    }
+
+    populateEditForm({
+      ...parsed,
+      notes: notes.join("\n\n"),
+      ingredients: parsed.ingredients.length ? parsed.ingredients : [""],
+      instructions: parsed.instructions.length ? parsed.instructions : [""],
+    });
     document.getElementById("edit-form").classList.remove("hidden");
-    if (parsed.partial) {
-      showError(errEl, "⚠️ Only the title and image could be extracted from this site. Please fill in the ingredients and instructions below.");
-      errEl.style.background = "#2a2e1a";
-      errEl.style.color = "#a8c060";
+
+    const warnings = [];
+    const dup = findRecipeBySource(url);
+    if (dup) warnings.push(`You already saved this recipe as "${dup.title}".`);
+    if (parsed.missing.length) {
+      const what = parsed.missing.join(" or ");
+      warnings.push(`Couldn't find the ${what} on this page. Please fill ${parsed.missing.length > 1 ? "them" : "it"} in below.`);
+    }
+    if (warnings.length) {
+      showWarning(errEl, warnings.join(" "), dup ? { label: "Open saved copy", onClick: () => openRecipe(dup.id) } : null);
     }
   } catch (e) {
     showError(errEl, e.message);
@@ -370,172 +395,81 @@ async function fetchRecipe() {
   }
 }
 
-// ── Proxy list (tried in order until one works) ────
+// A saved recipe with the same source link, ignoring tracking params, "www.",
+// trailing slashes and the #fragment.
+function findRecipeBySource(url) {
+  const key = RecipeExtract.urlKey(url);
+  return recipes.find(r => r.id !== editingId && r.sourceUrl && RecipeExtract.urlKey(r.sourceUrl) === key) || null;
+}
+
+// ── Proxies (raced in parallel; the first usable page wins) ────
+const PROXY_TIMEOUT_MS = 15000;
 const PROXIES = [
-  (url) => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-  (url) => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
-  (url) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+  {
+    name: "allorigins",
+    url: (u) => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
+    // Wraps the page in JSON and reports the recipe site's own status code.
+    read: async (res) => {
+      const data = await res.json();
+      const code = data?.status?.http_code;
+      if (code && code >= 400) throw new SiteError(code);
+      return data.contents || "";
+    },
+  },
+  {
+    name: "corsproxy",
+    url: (u) => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+    read: (res) => res.text(),
+  },
+  {
+    name: "codetabs",
+    url: (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+    read: (res) => res.text(),
+  },
 ];
 
+class SiteError extends Error {
+  constructor(status) {
+    super(`The recipe site returned an error (${status}).`);
+    this.status = status;
+  }
+}
+class BlockedError extends Error {}
+
 async function fetchViaProxy(url) {
-  let lastErr = null;
-  for (const makeProxy of PROXIES) {
+  const controllers = PROXIES.map(() => new AbortController());
+
+  const attempts = PROXIES.map(async (proxy, i) => {
+    const ctrl = controllers[i];
+    const timer = setTimeout(() => ctrl.abort(), PROXY_TIMEOUT_MS);
     try {
-      const proxyUrl = makeProxy(url);
-      const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(12000) });
-      if (!res.ok) { lastErr = new Error(`Proxy returned ${res.status}`); continue; }
-      // allorigins wraps in JSON; codetabs and corsproxy return raw HTML
-      const ct = res.headers.get("content-type") || "";
-      if (ct.includes("application/json")) {
-        const data = await res.json();
-        const html = data.contents || data.body || data.html || "";
-        if (html) return html;
-        lastErr = new Error("Proxy returned empty content"); continue;
-      }
-      const html = await res.text();
-      if (html) return html;
-      lastErr = new Error("Proxy returned empty content");
-    } catch (e) {
-      lastErr = e;
+      const res = await fetch(proxy.url(url), { signal: ctrl.signal });
+      // Proxies that pass the site's status through: 4xx/5xx from the site.
+      if (!res.ok) throw new SiteError(res.status);
+      const html = await proxy.read(res);
+      if (!html || html.length < 200) throw new Error("empty page");
+      if (RecipeExtract.looksBlocked(html)) throw new BlockedError("blocked");
+      return html;
+    } finally {
+      clearTimeout(timer);
     }
+  });
+
+  try {
+    const html = await Promise.any(attempts);
+    controllers.forEach(c => c.abort()); // stop the slower proxies
+    return html;
+  } catch (agg) {
+    const errors = agg.errors || [];
+    if (errors.some(e => e instanceof BlockedError)) {
+      throw new Error("This site blocks automated access (it showed a bot check instead of the recipe). Use Manual Entry, or try the site's print view link.");
+    }
+    const siteErr = errors.find(e => e instanceof SiteError && e.status !== 403 && e.status !== 429);
+    if (siteErr && siteErr.status === 404) {
+      throw new Error("That page wasn't found (404). Check the link and try again.");
+    }
+    throw new Error("Could not fetch the page through any proxy. Check your internet connection, or use Manual Entry.");
   }
-  throw new Error("Could not fetch the page through any proxy. Check your internet connection, or use Manual Entry.");
-}
-
-function parseRecipeFromHtml(html, sourceUrl) {
-  // ── Strategy 1: JSON-LD structured data ────────────
-  const jsonLdMatches = [...html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
-  for (const match of jsonLdMatches) {
-    try {
-      let obj = JSON.parse(match[1].replace(/[\u0000-\u001F]/g, " "));
-      // Handle @graph arrays (common on WordPress/Yoast sites)
-      const candidates = [];
-      if (Array.isArray(obj)) candidates.push(...obj);
-      else if (obj["@graph"]) candidates.push(...(Array.isArray(obj["@graph"]) ? obj["@graph"] : [obj["@graph"]]));
-      else candidates.push(obj);
-
-      for (const node of candidates) {
-        const types = [].concat(node["@type"] || []);
-        if (types.some(t => String(t).toLowerCase().includes("recipe"))) {
-          const result = extractFromJsonLd(node, sourceUrl);
-          if (result.title) return result;
-        }
-      }
-    } catch { /* skip malformed */ }
-  }
-
-  // ── Strategy 2: HTML microdata (itemprop) ──────────
-  const microdataResult = parseMicrodata(html, sourceUrl);
-  if (microdataResult && microdataResult.title) return microdataResult;
-
-  // ── Strategy 3: Meta tags (partial — at least gets title/image) ──
-  const title = metaContent(html, "og:title") || metaContent(html, "twitter:title") || htmlTitle(html);
-  const image = metaContent(html, "og:image") || metaContent(html, "twitter:image");
-  if (title) {
-    return { title: cleanText(title), image: image || "", ingredients: [], instructions: [], servings: "", sourceUrl, partial: true };
-  }
-
-  return null;
-}
-
-function extractFromJsonLd(data, sourceUrl) {
-  const title = cleanText(textOf(data.name));
-  const image = bestImageUrl(data.image);
-  const servings = cleanText(textOf(data.recipeYield) || textOf(data.yield));
-
-  const ingredients = [].concat(data.recipeIngredient || [])
-    .map(v => cleanText(textOf(v))).filter(Boolean);
-
-  let instructions = [];
-  const raw = data.recipeInstructions;
-  if (!raw) {
-    instructions = [];
-  } else if (typeof raw === "string") {
-    // Sometimes it's a big HTML blob
-    instructions = stripHtml(raw).split(/\n+/).map(s => s.trim()).filter(s => s.length > 3);
-  } else if (Array.isArray(raw)) {
-    instructions = raw.flatMap(step => {
-      if (!step) return [];
-      if (typeof step === "string") return [cleanText(step)];
-      const types = [].concat(step["@type"] || []);
-      if (types.some(t => String(t).toLowerCase().includes("howtosection"))) {
-        const header = step.name ? [`— ${cleanText(step.name)} —`] : [];
-        const items = [].concat(step.itemListElement || []).map(s =>
-          cleanText(textOf(s.text || s.name || s))
-        ).filter(Boolean);
-        return [...header, ...items];
-      }
-      return [cleanText(textOf(step.text || step.name || step))];
-    }).filter(Boolean);
-  }
-
-  return { title, image, ingredients, instructions, servings, sourceUrl };
-}
-
-function parseMicrodata(html, sourceUrl) {
-  // Very lightweight microdata extraction — look for itemprop attributes
-  const getItems = (prop) => {
-    const matches = [];
-    const re = new RegExp(`itemprop=["']${prop}["'][^>]*(?:content=["']([^"']+)["']|>([^<]*)<)`, "gi");
-    let m;
-    while ((m = re.exec(html)) !== null) matches.push(cleanText(m[1] || m[2] || ""));
-    return matches.filter(Boolean);
-  };
-
-  const title = getItems("name")[0] || "";
-  if (!title) return null;
-
-  const image = getItems("image")[0] || metaContent(html, "og:image") || "";
-  const servings = getItems("recipeYield")[0] || getItems("yield")[0] || "";
-  const ingredients = getItems("recipeIngredient").concat(getItems("ingredient"));
-  const instructions = getItems("recipeInstructions").concat(getItems("step")).flatMap(s =>
-    stripHtml(s).split(/\n+/).map(t => t.trim()).filter(t => t.length > 3)
-  );
-
-  return { title, image, ingredients, instructions, servings, sourceUrl };
-}
-
-// ── Text utilities ─────────────────────────────────
-function textOf(v) {
-  if (!v) return "";
-  if (typeof v === "string") return v;
-  if (Array.isArray(v)) return v.map(textOf).join(" ");
-  if (typeof v === "object") return textOf(v["@value"] || v.text || v.name || v.url || "");
-  return String(v);
-}
-
-function bestImageUrl(v) {
-  if (!v) return "";
-  if (typeof v === "string") return v;
-  if (Array.isArray(v)) {
-    // Prefer the largest (last in array, common pattern) or one with a url property
-    const urls = v.map(bestImageUrl).filter(Boolean);
-    return urls[urls.length - 1] || "";
-  }
-  if (typeof v === "object") return v.url || v["@id"] || "";
-  return "";
-}
-
-function stripHtml(str) {
-  return String(str || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-}
-
-function cleanText(str) {
-  return stripHtml(String(str || ""))
-    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ").trim();
-}
-
-function metaContent(html, prop) {
-  const m = html.match(new RegExp(`<meta[^>]+(?:property|name)=["']${prop}["'][^>]+content=["']([^"']*?)["']`, "i"))
-    || html.match(new RegExp(`<meta[^>]+content=["']([^"']*?)["'][^>]+(?:property|name)=["']${prop}["']`, "i"));
-  return m ? cleanText(m[1]) : null;
-}
-
-function htmlTitle(html) {
-  const m = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-  return m ? cleanText(m[1]) : null;
 }
 
 function setFetchLoading(on) {
@@ -667,7 +601,7 @@ async function saveRecipe() {
     servings: document.getElementById("edit-servings").value.trim(),
     prepTime: document.getElementById("edit-prep-time").value.trim(),
     cookTime: document.getElementById("edit-cook-time").value.trim(),
-    sourceUrl: document.getElementById("edit-source").value.trim(),
+    sourceUrl: RecipeExtract.normalizeSourceUrl(document.getElementById("edit-source").value.trim()),
     notes: document.getElementById("edit-notes").value.trim(),
     ingredients,
     instructions,
@@ -723,7 +657,7 @@ function resetAddForm() {
   editingId = null;
   document.querySelector("#view-add .view-header h2").textContent = "Add Recipe";
   document.getElementById("recipe-url").value = "";
-  document.getElementById("fetch-error").classList.add("hidden");
+  hideMessage(document.getElementById("fetch-error"));
   document.getElementById("edit-form").classList.add("hidden");
 
   // Reset to URL tab
@@ -890,6 +824,7 @@ function normNoun(word) {
 function ingredientNouns(recipe) {
   const nouns = new Set();
   for (const line of recipe.ingredients || []) {
+    if (sectionHeaderName(line) != null) continue;
     for (const word of String(line).toLowerCase().match(/[a-z]+/g) || []) {
       if (word.length < 3 || NOT_INGREDIENT_WORDS.has(word)) continue;
       if (UNIT_AFTER_RE.test(word)) continue;
@@ -924,7 +859,9 @@ function setScale(factor) {
 }
 
 function detailIngredientsHtml(recipe) {
-  return recipe.ingredients.map((ing, i) => `
+  return recipe.ingredients.map((ing, i) => sectionHeaderName(ing) != null
+    ? `<div class="list-group-header">${escHtml(sectionHeaderName(ing))}</div>`
+    : `
     <div class="ingredient-item" onclick="toggleIngredient(this)" data-index="${i}">
       <div class="ingredient-cb"></div>
       <span class="ingredient-text">${scaleText(ing, currentScale, true)}</span>
@@ -932,11 +869,20 @@ function detailIngredientsHtml(recipe) {
   `).join("");
 }
 
+// Step numbers that skip "— Section —" header lines.
+function stepNumbers(steps) {
+  let n = 0;
+  return steps.map(s => (sectionHeaderName(s) != null ? null : ++n));
+}
+
 function detailInstructionsHtml(recipe) {
   const nouns = ingredientNouns(recipe);
-  return recipe.instructions.map((step, i) => `
+  const nums = stepNumbers(recipe.instructions);
+  return recipe.instructions.map((step, i) => nums[i] == null
+    ? `<div class="list-group-header">${escHtml(sectionHeaderName(step))}</div>`
+    : `
     <div class="instruction-step">
-      <div class="step-num">${i + 1}</div>
+      <div class="step-num">${nums[i]}</div>
       <div>${scaleText(step, currentScale, true, { nouns })}</div>
     </div>
   `).join("");
@@ -944,16 +890,21 @@ function detailInstructionsHtml(recipe) {
 
 function cookInstructionsHtml(recipe) {
   const nouns = ingredientNouns(recipe);
-  return recipe.instructions.map((step, i) => `
+  const nums = stepNumbers(recipe.instructions);
+  return recipe.instructions.map((step, i) => nums[i] == null
+    ? `<div class="list-group-header">${escHtml(sectionHeaderName(step))}</div>`
+    : `
     <div class="cook-step" onclick="this.classList.toggle('done')">
-      <div class="step-num">${i + 1}</div>
+      <div class="step-num">${nums[i]}</div>
       <div>${scaleText(step, currentScale, true, { nouns })}</div>
     </div>
   `).join("");
 }
 
 function cookIngredientsHtml(recipe) {
-  return recipe.ingredients.map((ing, i) => `
+  return recipe.ingredients.map((ing, i) => sectionHeaderName(ing) != null
+    ? `<div class="list-group-header">${escHtml(sectionHeaderName(ing))}</div>`
+    : `
     <div class="cook-ingredient" onclick="this.classList.toggle('checked')" data-index="${i}">
       <div class="ingredient-cb"></div>
       <span>${scaleText(ing, currentScale, true)}</span>
@@ -1173,7 +1124,35 @@ function escHtml(str) {
 
 function showError(el, msg) {
   el.textContent = msg;
+  el.classList.remove("is-warning");
   el.classList.remove("hidden");
+}
+
+// Same box as showError, styled as a warning, with an optional action button.
+function showWarning(el, msg, action) {
+  el.textContent = `⚠️ ${msg}`;
+  if (action) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "msg-action";
+    btn.textContent = action.label;
+    btn.addEventListener("click", action.onClick);
+    el.append(" ", btn);
+  }
+  el.classList.add("is-warning");
+  el.classList.remove("hidden");
+}
+
+function hideMessage(el) {
+  el.classList.add("hidden");
+  el.classList.remove("is-warning");
+  el.textContent = "";
+}
+
+// Ingredient and instruction lists can hold group headers written as "— Name —".
+function sectionHeaderName(line) {
+  const m = String(line).match(/^\s*[—–]\s*(.+?)\s*[—–]\s*$/);
+  return m ? m[1] : null;
 }
 
 let toastTimer;

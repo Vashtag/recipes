@@ -543,6 +543,33 @@ html, body {
   line-height: 1.5;
 }
 .error-msg.hidden { display: none; }
+.error-msg.is-warning {
+  background: rgba(168,192,96,0.1);
+  color: #a8c060;
+  border-color: rgba(168,192,96,0.25);
+}
+.msg-action {
+  margin-left: 4px;
+  padding: 2px 10px;
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+/* "— Section —" group headers inside ingredient and step lists */
+.list-group-header {
+  padding: 14px 0 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+.list-group-header:first-child { padding-top: 0; }
 
 /* Setup / warning banner */
 .setup-banner {

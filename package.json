@@ -1,0 +1,11 @@
+{
+  "name": "recipes",
+  "private": true,
+  "description": "Recipe box web app",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "devDependencies": {
+    "jsdom": "25.0.1"
+  }
+}
